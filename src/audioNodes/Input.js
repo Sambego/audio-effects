@@ -6,7 +6,7 @@ export default class Input extends SingleAudioNode {
         return this._node;
     }
 
-    set node(stream) {
+    set input(stream) {
         this._node = this._audioContext.createMediaStreamSource(input);
 
         return this._node;

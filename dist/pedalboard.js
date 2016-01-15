@@ -194,7 +194,9 @@
 	        key: 'node',
 	        get: function get() {
 	            return this._node;
-	        },
+	        }
+	    }, {
+	        key: 'input',
 	        set: function set(stream) {
 	            this._node = this._audioContext.createMediaStreamSource(input);
 
@@ -222,14 +224,14 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var SingleAudioNode = function () {
-	    function SingleAudioNode(audioContext) {
-	        _classCallCheck(this, SingleAudioNode);
+	var AudioNode = function () {
+	    function AudioNode(audioContext) {
+	        _classCallCheck(this, AudioNode);
 
 	        this._audioContext = audioContext;
 	    }
 
-	    _createClass(SingleAudioNode, [{
+	    _createClass(AudioNode, [{
 	        key: "connect",
 	        value: function connect(node) {
 	            // Check if the node is one created by pedalboard.js
@@ -245,9 +247,9 @@
 	    }, {
 	        key: "disconnect",
 	        value: function disconnect() {
-	            this._node.disco;
+	            this._node.disconnect();
 
-	            return this._node;nnect();
+	            return this._node;
 	        }
 	    }, {
 	        key: "node",
@@ -259,10 +261,10 @@
 	        }
 	    }]);
 
-	    return SingleAudioNode;
+	    return AudioNode;
 	}();
 
-	exports.default = SingleAudioNode;
+	exports.default = AudioNode;
 	;
 
 /***/ },
