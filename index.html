@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedalboard.js</title>
+</head>
+<body>
+    <h1>Pedalboard.js</h1>
+
+    <script src="dist/pedalboard.js"></script>
+
+    <script>
+        !function() {
+            var pedalboard = new Pedalboard();
+
+            var input = pedalboard.input()
+                output = pedalboard.output(),
+                volume = pedalboard.volume(),
+                distortion = pedalboard.distortion();
+
+            input.getUserMedia().then(function() {
+                input.connect(volume).connect(distortion).connect(output);
+            });
+        }();
+    </script>
+</body>
+</html>
