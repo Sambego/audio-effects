@@ -1,4 +1,4 @@
-export default class SingleAudioNode {
+export default class AudioNode {
     constructor(audioContext) {
         this._audioContext = audioContext;
     }
@@ -24,8 +24,8 @@ export default class SingleAudioNode {
     }
 
     disconnect() {
-        this._node.disco
+        this._node.disconnect();
 
-        return this._node;nnect();
+        return this._node;
     }
 };
