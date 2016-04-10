@@ -46,27 +46,27 @@
 
 	'use strict';
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 
 	var _hasAudioContext = __webpack_require__(1);
 
-	var _Input = __webpack_require__(2);
+	var _SingleAudioNodeWrapper = __webpack_require__(2);
+
+	var _Input = __webpack_require__(4);
 
 	var _Input2 = _interopRequireDefault(_Input);
 
-	var _Output = __webpack_require__(5);
+	var _Output = __webpack_require__(6);
 
 	var _Output2 = _interopRequireDefault(_Output);
 
-	var _Volume = __webpack_require__(6);
+	var _Volume = __webpack_require__(7);
 
 	var _Volume2 = _interopRequireDefault(_Volume);
 
-	var _Distortion = __webpack_require__(7);
+	var _Distortion = __webpack_require__(8);
 
 	var _Distortion2 = _interopRequireDefault(_Distortion);
 
@@ -74,44 +74,51 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var defaultConfig = {};
+	var DEFAULT_CONFIG = {};
+	var NATIVE_AUDIO_NODES = ['Analyser', 'BiquadFilter', 'Buffer', 'BufferSource', 'ChannelMerger', 'ChannelSplitter', 'Convolver', 'Delay', 'DynamicsCompressor', 'Gain', 'MediaElementSource', 'MediaStreamDestination', 'MediaStreamSource', 'Oscillator', 'Panner', 'PeriodicWave', 'ScriptProcessor', 'StereoPanner', 'WaveShaper'];
+	var PEDALBOARD_AUDIO_NODES = [{
+	    name: 'Input',
+	    node: _Input2.default
+	}, {
+	    name: 'Output',
+	    node: _Output2.default
+	}, {
+	    name: 'Volume',
+	    node: _Volume2.default
+	}, {
+	    name: 'Distortion',
+	    node: _Distortion2.default
+	}];
 
-	var Pedalboard = function () {
-	    function Pedalboard(c) {
-	        _classCallCheck(this, Pedalboard);
+	var createNativeAudioNodeWrapper = function createNativeAudioNodeWrapper(pedalboard, audioContext) {
+	    NATIVE_AUDIO_NODES.forEach(function (node) {
+	        pedalboard['create' + node] = function () {
+	            return new _SingleAudioNodeWrapper.AudioNodeWrapper(audioContext, 'create' + node);
+	        };
+	    });
+	};
 
-	        if (!_hasAudioContext.hasAudioContext) {
-	            throw new Error('Your browser can not create an audioContext, please upgrade or use another browser!');
-	        }
+	var createPedalboardAudioNodes = function createPedalboardAudioNodes(pedalboard, audioContext) {
+	    PEDALBOARD_AUDIO_NODES.forEach(function (node) {
+	        pedalboard['create' + node.name] = function () {
+	            return new node.node(audioContext);
+	        };
+	    });
+	};
 
-	        this.config = Object.assign({}, defaultConfig, c);
-	        this.audioContext = new AudioContext();
+	var Pedalboard = function Pedalboard(config) {
+	    _classCallCheck(this, Pedalboard);
+
+	    if (!_hasAudioContext.hasAudioContext) {
+	        throw new Error('Your browser can not create an audioContext, please upgrade or use another browser!');
 	    }
 
-	    _createClass(Pedalboard, [{
-	        key: 'input',
-	        value: function input() {
-	            return new _Input2.default(this.audioContext);
-	        }
-	    }, {
-	        key: 'output',
-	        value: function output() {
-	            return new _Output2.default(this.audioContext);
-	        }
-	    }, {
-	        key: 'volume',
-	        value: function volume() {
-	            return new _Volume2.default(this.audioContext);
-	        }
-	    }, {
-	        key: 'distortion',
-	        value: function distortion() {
-	            return new _Distortion2.default(this.audioContext);
-	        }
-	    }]);
+	    this.config = Object.assign({}, DEFAULT_CONFIG, config);
+	    this.audioContext = new AudioContext();
 
-	    return Pedalboard;
-	}();
+	    createNativeAudioNodeWrapper(this, this.audioContext);
+	    createPedalboardAudioNodes(this, this.audioContext);
+	};
 
 	exports.default = Pedalboard;
 	;
@@ -140,17 +147,14 @@
 
 	'use strict';
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	exports.AudioNodeWrapper = undefined;
 
-	var _SingleAudioNode2 = __webpack_require__(3);
+	var _SingleAudioNode = __webpack_require__(3);
 
-	var _SingleAudioNode3 = _interopRequireDefault(_SingleAudioNode2);
-
-	var _hasGetUserMedia = __webpack_require__(4);
+	var _SingleAudioNode2 = _interopRequireDefault(_SingleAudioNode);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -160,54 +164,21 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Input = function (_SingleAudioNode) {
-	    _inherits(Input, _SingleAudioNode);
+	var AudioNodeWrapper = exports.AudioNodeWrapper = function (_AudioNode) {
+	    _inherits(AudioNodeWrapper, _AudioNode);
 
-	    function Input() {
-	        _classCallCheck(this, Input);
+	    function AudioNodeWrapper(audioContext, type) {
+	        _classCallCheck(this, AudioNodeWrapper);
 
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Input).apply(this, arguments));
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioNodeWrapper).call(this, audioContext));
+
+	        _this._node = audioContext[type]();
+	        return _this;
 	    }
 
-	    _createClass(Input, [{
-	        key: 'getUserMedia',
-	        value: function getUserMedia() {
-	            var _this2 = this;
+	    return AudioNodeWrapper;
+	}(_SingleAudioNode2.default);
 
-	            return new Promise(function (resolve, reject) {
-	                if (_hasGetUserMedia.hasGetUserMedia) {
-	                    navigator.getUserMedia({
-	                        audio: true
-	                    }, function (stream) {
-	                        _this2._node = _this2._audioContext.createMediaStreamSource(stream);
-
-	                        resolve(stream);
-	                    }, function (e) {
-	                        reject(e);
-	                    });
-	                } else {
-	                    reject('Your browser does not support the use of user-media, please upgrade or use another browser!');
-	                }
-	            });
-	        }
-	    }, {
-	        key: 'node',
-	        get: function get() {
-	            return this._node;
-	        }
-	    }, {
-	        key: 'input',
-	        set: function set(stream) {
-	            this._node = this._audioContext.createMediaStreamSource(input);
-
-	            return this._node;
-	        }
-	    }]);
-
-	    return Input;
-	}(_SingleAudioNode3.default);
-
-	exports.default = Input;
 	;
 
 /***/ },
@@ -269,6 +240,82 @@
 
 /***/ },
 /* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _SingleAudioNode2 = __webpack_require__(3);
+
+	var _SingleAudioNode3 = _interopRequireDefault(_SingleAudioNode2);
+
+	var _hasGetUserMedia = __webpack_require__(5);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Input = function (_SingleAudioNode) {
+	    _inherits(Input, _SingleAudioNode);
+
+	    function Input() {
+	        _classCallCheck(this, Input);
+
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Input).apply(this, arguments));
+	    }
+
+	    _createClass(Input, [{
+	        key: 'getUserMedia',
+	        value: function getUserMedia() {
+	            var _this2 = this;
+
+	            return new Promise(function (resolve, reject) {
+	                if (_hasGetUserMedia.hasGetUserMedia) {
+	                    navigator.getUserMedia({
+	                        audio: true
+	                    }, function (stream) {
+	                        _this2._node = _this2._audioContext.createMediaStreamSource(stream);
+
+	                        resolve(stream);
+	                    }, function (e) {
+	                        reject(e);
+	                    });
+	                } else {
+	                    reject('Your browser does not support the use of user-media, please upgrade or use another browser!');
+	                }
+	            });
+	        }
+	    }, {
+	        key: 'node',
+	        get: function get() {
+	            return this._node;
+	        }
+	    }, {
+	        key: 'input',
+	        set: function set(stream) {
+	            this._node = this._audioContext.createMediaStreamSource(input);
+
+	            return this._node;
+	        }
+	    }]);
+
+	    return Input;
+	}(_SingleAudioNode3.default);
+
+	exports.default = Input;
+	;
+
+/***/ },
+/* 5 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -281,7 +328,7 @@
 	var hasGetUserMedia = exports.hasGetUserMedia = !!navigator.getUserMedia;
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -322,7 +369,7 @@
 	exports.default = Output;
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -396,7 +443,7 @@
 	;
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -407,7 +454,7 @@
 	    value: true
 	});
 
-	var _MultiAudioNode2 = __webpack_require__(8);
+	var _MultiAudioNode2 = __webpack_require__(9);
 
 	var _MultiAudioNode3 = _interopRequireDefault(_MultiAudioNode2);
 
@@ -511,7 +558,7 @@
 	;
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -548,6 +595,7 @@
 	        value: function connect(node) {
 	            // Check if the node is one created by pedalboard.js
 	            //  otherwise assume it's a native one.
+	            console.log(this._outputNode, node);
 	            if (node.node) {
 	                this._outputNode.connect(node.node);
 	            } else {

@@ -12,6 +12,7 @@ export default class MultiAudioNode extends SingleAudioNode {
     connect(node) {
         // Check if the node is one created by pedalboard.js
         //  otherwise assume it's a native one.
+        console.log(this._outputNode, node);
         if (node.node) {
             this._outputNode.connect(node.node);
         } else {

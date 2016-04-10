@@ -12,14 +12,13 @@
     <script>
         !function() {
             var pedalboard = new Pedalboard();
-
-            var input = pedalboard.input()
-                output = pedalboard.output(),
-                volume = pedalboard.volume(),
-                distortion = pedalboard.distortion();
+            var input = pedalboard.createInput()
+            var output = pedalboard.createOutput(),
+                volume = pedalboard.createVolume(),
+                distortion = pedalboard.createDistortion();
 
             input.getUserMedia().then(function() {
-                // input.connect(volume).connect(distortion).connect(output);
+                input.connect(volume).connect(distortion).connect(output);
             });
         }();
     </script>
