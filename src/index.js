@@ -1,53 +1,43 @@
-import {hasAudioContext} from './helpers/hasAudioContext';
-import {AudioNodeWrapper} from './audioNodes/SingleAudioNodeWrapper';
-import Input from './audioNodes/Input';
-import Output from './audioNodes/Output';
-import Volume from './audioNodes/Volume';
-import Distortion from './audioNodes/Distortion';
+import HasAudioContext from './Helpers/HasAudioContext';
+import Effects from './audioNodes/Effects';
 
-const DEFAULT_CONFIG = {};
-const NATIVE_AUDIO_NODES = ['Analyser', 'BiquadFilter', 'Buffer', 'BufferSource', 'ChannelMerger', 'ChannelSplitter', 'Convolver', 'Delay', 'DynamicsCompressor', 'Gain', 'MediaElementSource', 'MediaStreamDestination', 'MediaStreamSource', 'Oscillator', 'Panner', 'PeriodicWave', 'ScriptProcessor', 'StereoPanner', 'WaveShaper'];
-const PEDALBOARD_AUDIO_NODES = [{
-        name: 'Input',
-        node: Input
-    }, {
-        name: 'Output',
-        node: Output
-    }, {
-        name: 'Volume',
-        node: Volume
-    }, {
-        name: 'Distortion',
-        node: Distortion
-}];
-
-const createNativeAudioNodeWrapper = function(pedalboard, audioContext) {
-    NATIVE_AUDIO_NODES.forEach(node => {
-        pedalboard[`create${node}`] = function() {
-            return new AudioNodeWrapper(audioContext, `create${node}`);
+/**
+ * Generate all methods to create a pedalboard audio node.
+ * These are the methods which will be generated:
+ * - createInput()
+ * - createOutput()
+ * - createVolume()
+ * - createDistortion()
+ *
+ * @param  {Class}        pedalboard   The pedalboard class to create the methods on.
+ * @param  {AudioContext} audioContext The audio-context which will be used by the method.
+ */
+const generatePedalboardAudioMethods = function(pedalboard, audioContext) {
+    // Loop over all effects.
+    for (let effect in Effects) {
+        // Create a method to create the effect in the pedalboard class.
+        pedalboard[`create${effect}`] = () => {
+            return new Effects[effect](audioContext);
         };
-    });
+    }
 };
 
-const createPedalboardAudioNodes = function(pedalboard, audioContext) {
-    PEDALBOARD_AUDIO_NODES.forEach(node => {
-        pedalboard[`create${node.name}`] = function() {
-            return new node.node(audioContext);
-        };
-    });
-};
-
+/**
+ * The main pedalboard class.
+ * This class contains methods to create pedalboard effects.
+ */
 export default class Pedalboard {
     constructor(config) {
-        if (!hasAudioContext) {
+        // If the browser doesn't support the web-audio-api, throw an error.
+        if (!HasAudioContext) {
             throw new Error('Your browser can not create an audioContext, please upgrade or use another browser!')
         }
 
-        this.config = Object.assign({}, DEFAULT_CONFIG, config);
+        // Create the audio-context the pedalboard is going to use.
         this.audioContext = new AudioContext();
 
-        createNativeAudioNodeWrapper(this, this.audioContext);
-        createPedalboardAudioNodes(this, this.audioContext);
+        // Generate all effect-creation methods.
+        generatePedalboardAudioMethods(this, this.audioContext);
     }
 };
 

@@ -50,74 +50,61 @@
 	    value: true
 	});
 
-	var _hasAudioContext = __webpack_require__(1);
+	var _HasAudioContext = __webpack_require__(1);
 
-	var _SingleAudioNodeWrapper = __webpack_require__(2);
+	var _HasAudioContext2 = _interopRequireDefault(_HasAudioContext);
 
-	var _Input = __webpack_require__(4);
+	var _Effects = __webpack_require__(2);
 
-	var _Input2 = _interopRequireDefault(_Input);
-
-	var _Output = __webpack_require__(6);
-
-	var _Output2 = _interopRequireDefault(_Output);
-
-	var _Volume = __webpack_require__(7);
-
-	var _Volume2 = _interopRequireDefault(_Volume);
-
-	var _Distortion = __webpack_require__(8);
-
-	var _Distortion2 = _interopRequireDefault(_Distortion);
+	var _Effects2 = _interopRequireDefault(_Effects);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var DEFAULT_CONFIG = {};
-	var NATIVE_AUDIO_NODES = ['Analyser', 'BiquadFilter', 'Buffer', 'BufferSource', 'ChannelMerger', 'ChannelSplitter', 'Convolver', 'Delay', 'DynamicsCompressor', 'Gain', 'MediaElementSource', 'MediaStreamDestination', 'MediaStreamSource', 'Oscillator', 'Panner', 'PeriodicWave', 'ScriptProcessor', 'StereoPanner', 'WaveShaper'];
-	var PEDALBOARD_AUDIO_NODES = [{
-	    name: 'Input',
-	    node: _Input2.default
-	}, {
-	    name: 'Output',
-	    node: _Output2.default
-	}, {
-	    name: 'Volume',
-	    node: _Volume2.default
-	}, {
-	    name: 'Distortion',
-	    node: _Distortion2.default
-	}];
-
-	var createNativeAudioNodeWrapper = function createNativeAudioNodeWrapper(pedalboard, audioContext) {
-	    NATIVE_AUDIO_NODES.forEach(function (node) {
-	        pedalboard['create' + node] = function () {
-	            return new _SingleAudioNodeWrapper.AudioNodeWrapper(audioContext, 'create' + node);
+	/**
+	 * Generate all methods to create a pedalboard audio node.
+	 * These are the methods which will be generated:
+	 * - createInput()
+	 * - createOutput()
+	 * - createVolume()
+	 * - createDistortion()
+	 *
+	 * @param  {Class}        pedalboard   The pedalboard class to create the methods on.
+	 * @param  {AudioContext} audioContext The audio-context which will be used by the method.
+	 */
+	var generatePedalboardAudioMethods = function generatePedalboardAudioMethods(pedalboard, audioContext) {
+	    var _loop = function _loop(effect) {
+	        // Create a method to create the effect in the pedalboard class.
+	        pedalboard['create' + effect] = function () {
+	            return new _Effects2.default[effect](audioContext);
 	        };
-	    });
+	    };
+
+	    // Loop over all effects.
+	    for (var effect in _Effects2.default) {
+	        _loop(effect);
+	    }
 	};
 
-	var createPedalboardAudioNodes = function createPedalboardAudioNodes(pedalboard, audioContext) {
-	    PEDALBOARD_AUDIO_NODES.forEach(function (node) {
-	        pedalboard['create' + node.name] = function () {
-	            return new node.node(audioContext);
-	        };
-	    });
-	};
+	/**
+	 * The main pedalboard class.
+	 * This class contains methods to create pedalboard effects.
+	 */
 
 	var Pedalboard = function Pedalboard(config) {
 	    _classCallCheck(this, Pedalboard);
 
-	    if (!_hasAudioContext.hasAudioContext) {
+	    // If the browser doesn't support the web-audio-api, throw an error.
+	    if (!_HasAudioContext2.default) {
 	        throw new Error('Your browser can not create an audioContext, please upgrade or use another browser!');
 	    }
 
-	    this.config = Object.assign({}, DEFAULT_CONFIG, config);
+	    // Create the audio-context the pedalboard is going to use.
 	    this.audioContext = new AudioContext();
 
-	    createNativeAudioNodeWrapper(this, this.audioContext);
-	    createPedalboardAudioNodes(this, this.audioContext);
+	    // Generate all effect-creation methods.
+	    generatePedalboardAudioMethods(this, this.audioContext);
 	};
 
 	exports.default = Pedalboard;
@@ -137,9 +124,13 @@
 	Object.defineProperty(exports, "__esModule", {
 	                      value: true
 	});
+	/**
+	 * Check if the current browser supports the web-audio-api .
+	 */
 	window.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
 
-	var hasAudioContext = exports.hasAudioContext = !!window.AudioContext;
+	var HasAudioContext = !!window.AudioContext;
+	exports.default = HasAudioContext;
 
 /***/ },
 /* 2 */
@@ -148,98 +139,35 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
-	exports.AudioNodeWrapper = undefined;
 
-	var _SingleAudioNode = __webpack_require__(3);
+	var _Input = __webpack_require__(3);
 
-	var _SingleAudioNode2 = _interopRequireDefault(_SingleAudioNode);
+	var _Input2 = _interopRequireDefault(_Input);
+
+	var _Output = __webpack_require__(6);
+
+	var _Output2 = _interopRequireDefault(_Output);
+
+	var _Volume = __webpack_require__(7);
+
+	var _Volume2 = _interopRequireDefault(_Volume);
+
+	var _Distortion = __webpack_require__(8);
+
+	var _Distortion2 = _interopRequireDefault(_Distortion);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var AudioNodeWrapper = exports.AudioNodeWrapper = function (_AudioNode) {
-	    _inherits(AudioNodeWrapper, _AudioNode);
-
-	    function AudioNodeWrapper(audioContext, type) {
-	        _classCallCheck(this, AudioNodeWrapper);
-
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioNodeWrapper).call(this, audioContext));
-
-	        _this._node = audioContext[type]();
-	        return _this;
-	    }
-
-	    return AudioNodeWrapper;
-	}(_SingleAudioNode2.default);
-
-	;
+	/**
+	 * Bundle all effects in one object.
+	 */
+	var Effects = { Input: _Input2.default, Output: _Output2.default, Volume: _Volume2.default, Distortion: _Distortion2.default };
+	exports.default = Effects;
 
 /***/ },
 /* 3 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var AudioNode = function () {
-	    function AudioNode(audioContext) {
-	        _classCallCheck(this, AudioNode);
-
-	        this._audioContext = audioContext;
-	    }
-
-	    _createClass(AudioNode, [{
-	        key: "connect",
-	        value: function connect(node) {
-	            // Check if the node is one created by pedalboard.js
-	            //  otherwise assume it's a native one.
-	            if (node.node) {
-	                this._node.connect(node.node);
-	            } else {
-	                this._node.connect(node);
-	            }
-
-	            return node;
-	        }
-	    }, {
-	        key: "disconnect",
-	        value: function disconnect() {
-	            this._node.disconnect();
-
-	            return this._node;
-	        }
-	    }, {
-	        key: "node",
-	        get: function get() {
-	            return this._node;
-	        },
-	        set: function set(node) {
-	            return this._node = node;
-	        }
-	    }]);
-
-	    return AudioNode;
-	}();
-
-	exports.default = AudioNode;
-	;
-
-/***/ },
-/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -250,11 +178,13 @@
 	    value: true
 	});
 
-	var _SingleAudioNode2 = __webpack_require__(3);
+	var _SingleAudioNode2 = __webpack_require__(4);
 
 	var _SingleAudioNode3 = _interopRequireDefault(_SingleAudioNode2);
 
-	var _hasGetUserMedia = __webpack_require__(5);
+	var _HasGetUserMedia = __webpack_require__(5);
+
+	var _HasGetUserMedia2 = _interopRequireDefault(_HasGetUserMedia);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -263,6 +193,11 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * The pedalboard input node.
+	 * This class lets the user set an input audio source or access the  uses' microphone.
+	 */
 
 	var Input = function (_SingleAudioNode) {
 	    _inherits(Input, _SingleAudioNode);
@@ -275,15 +210,20 @@
 
 	    _createClass(Input, [{
 	        key: 'getUserMedia',
+
+	        /**
+	         * Get the users microphone sound as input.
+	         * @return {Promise} Resolves when the user accepts to use the microphone.
+	         */
 	        value: function getUserMedia() {
 	            var _this2 = this;
 
 	            return new Promise(function (resolve, reject) {
-	                if (_hasGetUserMedia.hasGetUserMedia) {
+	                if (_HasGetUserMedia2.default) {
 	                    navigator.getUserMedia({
 	                        audio: true
 	                    }, function (stream) {
-	                        _this2._node = _this2._audioContext.createMediaStreamSource(stream);
+	                        _this2.input = stream;
 
 	                        resolve(stream);
 	                    }, function (e) {
@@ -295,14 +235,25 @@
 	            });
 	        }
 	    }, {
-	        key: 'node',
+	        key: 'input',
+
+	        /**
+	         * Getter for the effects input node.
+	         * @return {[type]} [description]
+	         */
 	        get: function get() {
 	            return this._node;
 	        }
-	    }, {
-	        key: 'input',
+
+	        /**
+	         * Setter for the effects input node.
+	         * @param  {AudioStrea,} stream
+	         * @return {AudioNode}
+	         */
+	        ,
 	        set: function set(stream) {
-	            this._node = this._audioContext.createMediaStreamSource(input);
+	            // Create a media-stream source.
+	            this._node = this._audioContext.createMediaStreamSource(stream);
 
 	            return this._node;
 	        }
@@ -315,6 +266,94 @@
 	;
 
 /***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	/**
+	 * The basic audio node class.
+	 * This is de skeleton for a pedalboard effect.
+	 * When the effect only contains 1 audioNode this class can be used.
+	 */
+
+	var AudioNode = function () {
+	    function AudioNode(audioContext) {
+	        _classCallCheck(this, AudioNode);
+
+	        // Set the audio-context.
+	        this._audioContext = audioContext;
+	    }
+
+	    /**
+	     * The effect's audio-node getter.
+	     * @return {AudioNode} The audio-node used for the effect.
+	     */
+
+	    _createClass(AudioNode, [{
+	        key: "connect",
+
+	        /**
+	         * Connect the effect to other effects or native audio-nodes.
+	         * @param  {Native AudioNode | Pedalboard AudioNode} node
+	         * @return {Native AudioNode | Pedalboard AudioNode}
+	         */
+	        value: function connect(node) {
+	            // Check if the node is a Pedalboard AudioNode,
+	            //  otherwise assume it's a native one.
+	            if (node.node) {
+	                this.node.connect(node.node);
+	            } else {
+	                this.node.connect(node);
+	            }
+
+	            return node;
+	        }
+
+	        /**
+	         * disconnect the effect.
+	         * @return {Pedalboard AudioNode}
+	         */
+
+	    }, {
+	        key: "disconnect",
+	        value: function disconnect() {
+	            this.node.disconnect();
+
+	            return this.node;
+	        }
+	    }, {
+	        key: "node",
+	        get: function get() {
+	            return this._node;
+	        }
+
+	        /**
+	         * The effect's audio-node setter.
+	         * @param  {AudioNode} node
+	         * @return {AudioNode}
+	         */
+	        ,
+	        set: function set(node) {
+	            return this._node = node;
+	        }
+	    }]);
+
+	    return AudioNode;
+	}();
+
+	exports.default = AudioNode;
+	;
+
+/***/ },
 /* 5 */
 /***/ function(module, exports) {
 
@@ -323,9 +362,13 @@
 	Object.defineProperty(exports, "__esModule", {
 	                         value: true
 	});
+	/**
+	 * Check if the current browser supports getUserMedia.
+	 */
 	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
-	var hasGetUserMedia = exports.hasGetUserMedia = !!navigator.getUserMedia;
+	var HasGetUserMedia = !!navigator.getUserMedia;
+	exports.default = HasGetUserMedia;
 
 /***/ },
 /* 6 */
@@ -337,7 +380,7 @@
 	    value: true
 	});
 
-	var _SingleAudioNode2 = __webpack_require__(3);
+	var _SingleAudioNode2 = __webpack_require__(4);
 
 	var _SingleAudioNode3 = _interopRequireDefault(_SingleAudioNode2);
 
@@ -348,6 +391,11 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * The pedalboard output class.
+	 * This class connects to the user' device audio output.
+	 */
 
 	var Output = function (_SingleAudioNode) {
 	    _inherits(Output, _SingleAudioNode);
@@ -380,7 +428,7 @@
 	    value: true
 	});
 
-	var _SingleAudioNode2 = __webpack_require__(3);
+	var _SingleAudioNode2 = __webpack_require__(4);
 
 	var _SingleAudioNode3 = _interopRequireDefault(_SingleAudioNode2);
 
@@ -392,19 +440,28 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	/**
+	 * The pedalboard volume class.
+	 * This class lets the user change the volume of the audio signal.
+	 */
+
 	var Volume = function (_SingleAudioNode) {
 	    _inherits(Volume, _SingleAudioNode);
 
 	    function Volume(audioContext) {
 	        _classCallCheck(this, Volume);
 
+	        // Create the gain-node which we'll use to change the volume.
+
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Volume).call(this, audioContext));
 
-	        _this._level = 1;
-	        _this._mute = false;
+	        _this.node = _this._audioContext.createGain();
 
-	        _this._node = _this._audioContext.createGain();
-	        _this._node.gain.value = _this._level;
+	        // The initial volume level is 100%.
+	        _this.level = 1;
+
+	        // The effect is not muted by default.
+	        _this.mute = true;
 	        return _this;
 	    }
 
@@ -569,7 +626,7 @@
 	    value: true
 	});
 
-	var _SingleAudioNode2 = __webpack_require__(3);
+	var _SingleAudioNode2 = __webpack_require__(4);
 
 	var _SingleAudioNode3 = _interopRequireDefault(_SingleAudioNode2);
 
@@ -580,6 +637,14 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * The multi-audio-node class.
+	 * When creating an effect existing out of multiple audio-nodes, we can wrap it in this class.
+	 * You can set the input node (effect.node) and the output node of the effect (effect.output).
+	 * The input node is the first audio-node in the effect, the previous effect will be connected to this node.
+	 * The output node is the last audio-node in the effect, the next effect will be connected to this node.
+	 */
 
 	var MultiAudioNode = function (_SingleAudioNode) {
 	    _inherits(MultiAudioNode, _SingleAudioNode);
@@ -592,30 +657,53 @@
 
 	    _createClass(MultiAudioNode, [{
 	        key: 'connect',
+
+	        /**
+	         * Connect the effect to other effects or native audio-nodes.
+	         * @param  {Native AudioNode | Pedalboard AudioNode} node
+	         * @return {Native AudioNode | Pedalboard AudioNode}
+	         */
 	        value: function connect(node) {
 	            // Check if the node is one created by pedalboard.js
 	            //  otherwise assume it's a native one.
-	            console.log(this._outputNode, node);
 	            if (node.node) {
-	                this._outputNode.connect(node.node);
+	                this.output.connect(node.node);
 	            } else {
-	                this._outputNode.connect(node);
+	                this.output.connect(node);
 	            }
 
 	            return node;
 	        }
+
+	        /**
+	         * disconnect the effect.
+	         * @return {Pedalboard AudioNode}
+	         */
+
 	    }, {
 	        key: 'disconnect',
 	        value: function disconnect() {
-	            this._outputNode.disconnect();
+	            this.output.disconnect();
 
-	            return this._outputNode;
+	            return this.output;
 	        }
 	    }, {
 	        key: 'output',
+
+	        /**
+	         * Getter for the effects output node.
+	         * @return {AudioNode}
+	         */
 	        get: function get() {
-	            return this._node;
-	        },
+	            return this._outputNode;
+	        }
+
+	        /**
+	         * Setter for the effects output node.
+	         * @param  {AudioNode} output
+	         * @return {AudioNode}
+	         */
+	        ,
 	        set: function set(output) {
 	            return this._outputNode = output;
 	        }

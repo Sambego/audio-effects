@@ -1,9 +1,14 @@
 import AudioNode from './SingleAudioNode';
 
-export class AudioNodeWrapper extends AudioNode {
+/**
+ * Wrap a native audio-node so we can chain it when connecting.
+ */
+export default class AudioNodeWrapper extends AudioNode {
     constructor(audioContext, type) {
         super(audioContext);
 
-        this._node = audioContext[type]();
+        this.node = audioContext[type]();
+
+        return this.node;
     }
 };
