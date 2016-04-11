@@ -20,7 +20,7 @@ You can either supply an audio stream.
 
 ```javascript
 const stream = // Some audio stream
-      input = pedalboard.input();
+      input = pedalboard.createInput();
       input.input = stream;
 
 ```
@@ -28,23 +28,23 @@ const stream = // Some audio stream
 Or use the `getUserMedia` method to access the devices microphone.
 
 ```javascript
-const input = pedalboard.input();
+const input = pedalboard.createInput();
       input.getUserMedia();
 
 ```
 
 ## Output
-This is the audio node which should be at the and of the chain, this connects our audio to the devices spearkers.
+This is the audio node which should be at the and of the chain, this connects our audio to the devices speakers.
 
 ```javascript
-const output = pedalboard.output();
+const output = pedalboard.createOutput();
 ```
 
 ## Volume
-Controll the volume of your audio or mute it.
+Control the volume of your audio or mute it.
 
 ```javascript
-const volume = pedalboard.volume();
+const volume = pedalboard.createVolume();
       volume.level = 0.5; // Change the volume to 50%
       volume.mute = true; // Mute the volume
 ```
@@ -53,10 +53,10 @@ const volume = pedalboard.volume();
 Add a distortion effect>
 
 ```javascript
-const distortion = pedalboard.distortion();
-      distorion.intensity = 200; // Set the intensity to 200
-      distorion.gain = 100; // Set the gain to 100
-      distorion.lowPassFilter = true; // Enable the lowpass filter
+const distortion = pedalboard.createDistortion();
+      distortion.intensity = 200; // Set the intensity to 200
+      distortion.gain = 100; // Set the gain to 100
+      distortion.lowPassFilter = true; // Enable the lowpass filter
 ```
 
 ## Chaining
