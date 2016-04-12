@@ -35,7 +35,7 @@ export default class Volume extends SingleAudioNode{
         this._node.gain.value = vol;
 
         // Set the internal mute value.
-        this.mute = (vol === 0);
+        this._mute = (vol === 0);
 
         return this._level;
     }

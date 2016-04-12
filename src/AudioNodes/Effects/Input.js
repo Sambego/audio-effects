@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import SingleAudioNode from '../SingleAudioNode';
 import HasGetUserMedia from '../../helpers/HasGetUserMedia'
 
@@ -6,6 +7,12 @@ import HasGetUserMedia from '../../helpers/HasGetUserMedia'
  * This class lets you set an input audio source or access the  uses' microphone.
  */
 export default class Input extends SingleAudioNode {
+    constructor(audioContext) {
+        super(audioContext);
+
+        this._hasPermissions = false;
+    }
+
     /**
      * Getter for the effects input node.
      * @return {[type]} [description]
@@ -36,14 +43,42 @@ export default class Input extends SingleAudioNode {
                 navigator.getUserMedia({
                     audio: true
                 }, stream => {
+                    console.log('has no permissions');
                     this.input = stream;
+                    this._hasPermissions = true;
 
                     resolve(stream);
-                },  e => {
-                    reject(e)
+                }, error => {
+                    reject(error);
                 });
             } else {
                 reject('Your browser does not support the use of user-media, please upgrade or use another browser!')
+            }
+        });
+    }
+
+    /**
+     * Get a list of audio in-and-output devices devices.
+     * @return {Array} A list of the available audio in-and-output devices.
+     */
+    getAudioDevices() {
+        return new Promise((resolve, reject) =>{
+            if (this._hasPermissions) {
+                navigator.mediaDevices.enumerateDevices().then(devices => {
+                    resolve(_.filter(devices, {kind: 'audioinput'}));
+                }).catch(error => {
+                    reject(error);
+                });
+            } else {
+                this.getUserMedia().then(() => {
+                    navigator.mediaDevices.enumerateDevices().then(devices => {
+                        resolve(_.filter(devices, {kind: 'audioinput'}));
+                    }).catch(error => {
+                        reject(error);
+                    });
+                }).catch(error => {
+                    reject(error);
+                });
             }
         });
     }

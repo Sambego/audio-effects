@@ -85,7 +85,7 @@ export default class Distortion extends MultiAudioNode {
         // Set the internal intensity value.
         this._intensity = parseInt(intensity)
         // Set the new curve of the waveshaper-node
-        this._waveshaperNode.curve = _calculateDistortionCurve(this._intensity);
+        _waveshaperNode.curve = _calculateDistortionCurve(this._intensity);
 
         return this._intensity;
     }
@@ -107,7 +107,7 @@ export default class Distortion extends MultiAudioNode {
         // Set the internal gain value.
         this._gain = parseFloat(gain);
         // Set the gain-node's gain value.
-        this._gainNode.gain.value = this._gain;
+        _gainNode.gain.value = this._gain;
 
         return this._gain;
     }
@@ -129,7 +129,7 @@ export default class Distortion extends MultiAudioNode {
         // Set the internal lowpass filter value.
         this._lowPassFilter = !!lowPassFilter;
         // Set the biquad-filter-node's frequency.
-        this._biquadFilterNode.frequency.value = (_this.lowPassFilter ? 2000 : 1000)
+        _biquadFilterNode.frequency.value = (this._lowPassFilter ? 2000 : 1000)
 
         return this._lowPassFilter;
     }

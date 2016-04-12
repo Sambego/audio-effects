@@ -19,6 +19,10 @@
 
             input.getUserMedia().then(function() {
                 input.connect(volume).connect(distortion).connect(output);
+
+                input.getAudioDevices().then(function(devices) {
+                    console.log('Devices:', devices);
+                });
             });
         }();
     </script>
