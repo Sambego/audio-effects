@@ -43,7 +43,6 @@ export default class Input extends SingleAudioNode {
                 navigator.getUserMedia({
                     audio: true
                 }, stream => {
-                    console.log('has no permissions');
                     this.input = stream;
                     this._hasPermissions = true;
 
