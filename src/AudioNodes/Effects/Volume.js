@@ -12,7 +12,7 @@ export default class Volume extends SingleAudioNode{
         this.node = this._audioContext.createGain();
 
         // The initial volume level is 100%.
-        this.level = 1;
+        this.level = this._levelBeforeMute = 1;
 
         // The effect is not muted by default.
         this.mute = false;
@@ -56,6 +56,7 @@ export default class Volume extends SingleAudioNode{
     set mute(mute) {
         // Set the internal mute value.
         this._mute = !!mute;
+
 
         if (this._mute) {
             // Keep track of the volume before muting

@@ -235,7 +235,6 @@
 	                    navigator.getUserMedia({
 	                        audio: true
 	                    }, function (stream) {
-	                        console.log('has no permissions');
 	                        _this2.input = stream;
 	                        _this2._hasPermissions = true;
 
@@ -250,8 +249,8 @@
 	        }
 
 	        /**
-	         * Get a list of input devices
-	         * @return {[type]} [description]
+	         * Get a list of audio in-and-output devices devices.
+	         * @return {Array} A list of the available audio in-and-output devices.
 	         */
 
 	    }, {
@@ -260,7 +259,6 @@
 	            var _this3 = this;
 
 	            return new Promise(function (resolve, reject) {
-	                console.log(_this3._hasPermissions);
 	                if (_this3._hasPermissions) {
 	                    navigator.mediaDevices.enumerateDevices().then(function (devices) {
 	                        resolve(_lodash2.default.filter(devices, { kind: 'audioinput' }));
@@ -274,6 +272,8 @@
 	                        }).catch(function (error) {
 	                            reject(error);
 	                        });
+	                    }).catch(function (error) {
+	                        reject(error);
 	                    });
 	                }
 	            });
@@ -12871,7 +12871,7 @@
 	        _this.node = _this._audioContext.createGain();
 
 	        // The initial volume level is 100%.
-	        _this.level = 1;
+	        _this.level = _this._levelBeforeMute = 1;
 
 	        // The effect is not muted by default.
 	        _this.mute = false;
