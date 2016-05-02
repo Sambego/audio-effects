@@ -22,15 +22,7 @@
                 reverb = pedalboard.createReverb();
 
             input.getUserMedia().then(function() {
-                input.connect(distortion).connect(reverb).connect(flanger).connect(delay).connect(output);
-
-                input.disconnect();
-                volume.disconnect();
-                distortion.disconnect();
-                delay.disconnect();
-                delay.disconnect();
-                flanger.disconnect();
-                reverb.disconnect();
+                input.connect(reverb).connect(output);
             });
         }();
     </script>

@@ -10,6 +10,9 @@ module.exports = {
                 query: {
                     presets: ['es2015']
                 }
+            },{
+                test: /\.ogg/,
+                include: __dirname + '/src/audio'
             }
         ]
     },

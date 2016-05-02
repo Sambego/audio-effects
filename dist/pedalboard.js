@@ -12762,6 +12762,17 @@
 
 	            return this.node;
 	        }
+
+	        /**
+	         * Alias for the disconnect method, to offer the same api as a MultiAudioNode.
+	         * @return {Pedalboard AudioNode}
+	         */
+
+	    }, {
+	        key: "destroy",
+	        value: function destroy() {
+	            return this.disconnect();
+	        }
 	    }, {
 	        key: "node",
 	        get: function get() {
@@ -13226,25 +13237,34 @@
 	        }
 
 	        /**
-	         * disconnect the effect.
+	         * Disconnect the effect.
 	         * @return {Pedalboard AudioNode}
 	         */
 
 	    }, {
 	        key: 'disconnect',
 	        value: function disconnect() {
+	            this.output.disconnect();
+
+	            return this.output;
+	        }
+
+	        /**
+	         * Destroy an effect.
+	         */
+
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {
 	            var _this2 = this;
 
-	            this.output.disconnect();
+	            this.disconnect();
 
 	            Object.keys(this.nodes).forEach(function (node) {
 	                if (_this2.nodes[node].disconnect && typeof _this2.nodes[node].disconnect === 'function') {
-	                    console.log(_this2.nodes[node]);
 	                    _this2.nodes[node].disconnect();
 	                }
 	            });
-
-	            return this.output;
 	        }
 	    }, {
 	        key: 'output',
@@ -13646,7 +13666,7 @@
 
 	// Load the input response file
 	var _getInputResponseFile = function getInputResponseFile() {
-	    return fetch('./src/audio/hall-reverb.ogg', {
+	    return fetch('../../audio/hall-reverb.ogg', {
 	        method: 'get'
 	    }).then(function (response) {
 	        return response.arrayBuffer();
