@@ -49,13 +49,13 @@ export default class Flanger extends MultiAudioNode {
         this.delay = 0.005;
 
         // Set the default depth to 0.002;
-        this.depth = 0.002
+        this.depth = 0.002;
 
         // Set the default feedback to 0.5
         this.feedback = 0.5;
 
         // Set the default speed to 0.25Hz
-        this.speed = 0.25
+        this.speed = 0.25;
     }
 
     /**
