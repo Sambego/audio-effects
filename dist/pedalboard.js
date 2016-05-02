@@ -12981,6 +12981,7 @@
 	// "Private" varibles
 	var _waveshaperNode = undefined,
 	    _gainNode = undefined,
+	    _gainNode2 = undefined,
 	    _biquadFilterNode = undefined;
 
 	/**
@@ -13028,6 +13029,7 @@
 
 	        // Create the gain-node we use to increase the gain.
 	        _gainNode = _this._audioContext.createGain();
+	        _gainNode2 = _this._audioContext.createGain();
 
 	        // Create the biquad-filter-node we'll use to create a lowpass filter.
 	        _biquadFilterNode = _this._audioContext.createBiquadFilter();
@@ -13038,7 +13040,8 @@
 
 	        // Connect all nodes together
 	        _waveshaperNode.connect(_gainNode);
-	        _gainNode.connect(_biquadFilterNode);
+	        _gainNode.connect(_gainNode2);
+	        _gainNode2.connect(_biquadFilterNode);
 
 	        // Set the waveshaper-node as the input-node.
 	        _this._node = _waveshaperNode;
@@ -13048,7 +13051,7 @@
 	        // The default intensity is 100.
 	        _this.intensity = 100;
 	        // The default gain is 1.
-	        _this.gain = 1;
+	        _this.gain = 50;
 	        // // The lowpass filter is turned off by default.
 	        _this.lowPassFilter = false;
 	        return _this;
@@ -13100,8 +13103,10 @@
 	        set: function set(gain) {
 	            // Set the internal gain value.
 	            this._gain = parseFloat(gain);
+
 	            // Set the gain-node's gain value.
 	            _gainNode.gain.value = this._gain;
+	            _gainNode2.gain.value = 1 / this._gain;
 
 	            return this._gain;
 	        }
