@@ -212,8 +212,8 @@ class CustomEffect extends SingleAudioNode {
 ```
 
 # Todo
-[ ] Write tests!
-[ ] Add tuner
+- [ ] Write tests!
+- [ ] Add tuner
 
 
 # License
