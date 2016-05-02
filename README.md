@@ -1,6 +1,6 @@
 # Audio-effects
 
-A javascript library to create audio effects using the web-audio-api. This library contains the following effect:
+A javascript library to create audio effects using the web-audio-api. This library contains the following effects:
 - Volume
 - Distortion
 - Delay
@@ -8,6 +8,11 @@ A javascript library to create audio effects using the web-audio-api. This libra
 - Reverb
 
 I will try to add more effects in the future.
+
+# Install
+```
+npm install --save audio-effects
+```
 
 # API
 
