@@ -12,15 +12,17 @@
     <script>
         !function() {
             var pedalboard = new Pedalboard();
+
             var input = pedalboard.createInput(),
                 output = pedalboard.createOutput(),
                 volume = pedalboard.createVolume(),
                 distortion = pedalboard.createDistortion(),
                 delay = pedalboard.createDelay(),
-                flanger = pedalboard.createFlanger();
+                flanger = pedalboard.createFlanger(),
+                reverb = pedalboard.createReverb();
 
             input.getUserMedia().then(function() {
-                input.connect(volume).connect(distortion).connect(flanger).connect(output);
+                input.connect(volume).connect(distortion).connect(reverb).connect(flanger).connect(output);
             });
         }();
     </script>

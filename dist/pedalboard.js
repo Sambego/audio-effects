@@ -71,6 +71,7 @@
 	 * - createDistortion()
 	 * - createDelay()
 	 * - createFlanger()
+	 * - createReverb()
 	 *
 	 * @param  {Class}        pedalboard   The pedalboard class to create the methods on.
 	 * @param  {AudioContext} audioContext The audio-context which will be used by the method.
@@ -79,7 +80,11 @@
 	    var _loop = function _loop(effect) {
 	        // Create a method to create the effect in the pedalboard class.
 	        pedalboard['create' + effect] = function () {
-	            return new _Effects2.default[effect](audioContext);
+	            for (var _len = arguments.length, params = Array(_len), _key = 0; _key < _len; _key++) {
+	                params[_key] = arguments[_key];
+	            }
+
+	            return new (Function.prototype.bind.apply(_Effects2.default[effect], [null].concat([audioContext], params)))();
 	        };
 	    };
 
@@ -168,12 +173,16 @@
 
 	var _Flanger2 = _interopRequireDefault(_Flanger);
 
+	var _Reverb = __webpack_require__(14);
+
+	var _Reverb2 = _interopRequireDefault(_Reverb);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	/**
 	 * Bundle all effects in one object.
 	 */
-	var Effects = { Input: _Input2.default, Output: _Output2.default, Volume: _Volume2.default, Distortion: _Distortion2.default, Delay: _Delay2.default, Flanger: _Flanger2.default };
+	var Effects = { Input: _Input2.default, Output: _Output2.default, Volume: _Volume2.default, Distortion: _Distortion2.default, Delay: _Delay2.default, Flanger: _Flanger2.default, Reverb: _Reverb2.default };
 	exports.default = Effects;
 
 /***/ },
@@ -13632,6 +13641,197 @@
 	}(_MultiAudioNode3.default);
 
 	exports.default = Flanger;
+	;
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _MultiAudioNode2 = __webpack_require__(11);
+
+	var _MultiAudioNode3 = _interopRequireDefault(_MultiAudioNode2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	// "Private" varibles
+	var _inputGainNode = undefined,
+	    _convolverNode = undefined,
+	    _wetGainNode = undefined,
+	    _levelGainNode = undefined,
+	    _outputGainNode = undefined;
+
+	// Load the input response file
+	var _getInputResponseFile = function getInputResponseFile() {
+	    return fetch('src/audio/hall-reverb.ogg', {
+	        method: 'get'
+	    }).then(function (response) {
+	        return response.arrayBuffer();
+	    });
+	};
+
+	/**
+	 * The pedalboard reverb class.
+	 * This class lets you add a reverb effect.
+	 */
+
+	var Reverb = function (_MultiAudioNode) {
+	    _inherits(Reverb, _MultiAudioNode);
+
+	    function Reverb(audioContext, buffer) {
+	        _classCallCheck(this, Reverb);
+
+	        // Set the audioContext
+
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Reverb).call(this, audioContext));
+
+	        _this.audioContext = audioContext;
+
+	        // Create the input and output gain-node
+	        _inputGainNode = audioContext.createGain();
+	        _outputGainNode = audioContext.createGain();
+
+	        // Create the convolver node to create the reverb effect
+	        _convolverNode = audioContext.createConvolver();
+
+	        // Create the wetness controll gain-node
+	        _wetGainNode = audioContext.createGain();
+
+	        // Create the level controll gain-node
+	        _levelGainNode = audioContext.createGain();
+
+	        // Wire it all up
+	        _inputGainNode.connect(_convolverNode);
+	        _inputGainNode.connect(_wetGainNode);
+	        _convolverNode.connect(_levelGainNode);
+	        _levelGainNode.connect(_outputGainNode);
+	        _wetGainNode.connect(_outputGainNode);
+
+	        // Set the input gain-node as the input-node.
+	        _this._node = _inputGainNode;
+	        // Set the output gain-node as the output-node.
+	        _this._outputNode = _outputGainNode;
+
+	        // Set the default wetness to 0.5
+	        _this.wet = 0.5;
+
+	        // Set the default level to 1
+	        _this.level = 1;
+
+	        // Set the convolver buffer
+	        if (buffer) {
+	            _this.buffer = buffer;
+	        } else {
+	            _getInputResponseFile().then(function (buffer) {
+	                _this.buffer = buffer;
+	            });
+	        }
+	        return _this;
+	    }
+
+	    /**
+	     * Getter for the effect's wetness
+	     * @return {Float}
+	     */
+
+	    _createClass(Reverb, [{
+	        key: 'wet',
+	        get: function get() {
+	            return this._wet;
+	        }
+
+	        /**
+	         * Setter for the effect's wetness
+	         * @param  {Float} wetness
+	         * @return {Float}
+	         */
+	        ,
+	        set: function set(wetness) {
+	            // Set the internal wetness value
+	            this._wet = parseFloat(wetness);
+
+	            // Set the new value for the wetness controll gain-node
+	            _wetGainNode.gain.value = this._wet;
+
+	            return this._wet;
+	        }
+
+	        /**
+	         * Getter for the effect's level
+	         * @return {Float}
+	         */
+
+	    }, {
+	        key: 'level',
+	        get: function get() {
+	            return this._level;
+	        }
+
+	        /**
+	         * Setter for the effect's level
+	         * @param  {Float} level
+	         * @return {Float}
+	         */
+	        ,
+	        set: function set(level) {
+	            // Set the internal level value
+	            this._level = parseFloat(level);
+
+	            // Set the delayTime value of the delay-node
+	            _levelGainNode.gain.value = this._level;
+
+	            return this._level;
+	        }
+
+	        /**
+	         * Getter for the effect's convolver buffer
+	         * @return {Buffer}
+	         */
+
+	    }, {
+	        key: 'buffer',
+	        get: function get() {
+	            return this._buffer;
+	        }
+
+	        /**
+	         * Setter for the effect's convolver buffer
+	         * @param  {Stream} buffer
+	         * @return {Buffer}
+	         */
+	        ,
+	        set: function set(buffer) {
+	            var _this2 = this;
+
+	            return this.audioContext.decodeAudioData(buffer, function (buffer) {
+	                // Set the internal buffer value
+	                _this2._buffer = buffer;
+
+	                // Set the buffer gain-node value
+	                _convolverNode.buffer = _this2._buffer;
+
+	                return _this2._buffer;
+	            });
+	        }
+	    }]);
+
+	    return Reverb;
+	}(_MultiAudioNode3.default);
+
+	exports.default = Reverb;
 	;
 
 /***/ }

@@ -10,6 +10,7 @@ import Effects from './audioNodes/Effects';
  * - createDistortion()
  * - createDelay()
  * - createFlanger()
+ * - createReverb()
  *
  * @param  {Class}        pedalboard   The pedalboard class to create the methods on.
  * @param  {AudioContext} audioContext The audio-context which will be used by the method.
@@ -18,8 +19,8 @@ const generatePedalboardAudioMethods = function(pedalboard, audioContext) {
     // Loop over all effects.
     for (let effect in Effects) {
         // Create a method to create the effect in the pedalboard class.
-        pedalboard[`create${effect}`] = () => {
-            return new Effects[effect](audioContext);
+        pedalboard[`create${effect}`] = (...params) => {
+            return new Effects[effect](audioContext, ...params);
         };
     }
 };
