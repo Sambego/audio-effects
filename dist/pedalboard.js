@@ -70,6 +70,7 @@
 	 * - createVolume()
 	 * - createDistortion()
 	 * - createDelay()
+	 * - createFlanger()
 	 *
 	 * @param  {Class}        pedalboard   The pedalboard class to create the methods on.
 	 * @param  {AudioContext} audioContext The audio-context which will be used by the method.
@@ -163,12 +164,16 @@
 
 	var _Delay2 = _interopRequireDefault(_Delay);
 
+	var _Flanger = __webpack_require__(13);
+
+	var _Flanger2 = _interopRequireDefault(_Flanger);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	/**
 	 * Bundle all effects in one object.
 	 */
-	var Effects = { Input: _Input2.default, Output: _Output2.default, Volume: _Volume2.default, Distortion: _Distortion2.default, Delay: _Delay2.default };
+	var Effects = { Input: _Input2.default, Output: _Output2.default, Volume: _Volume2.default, Distortion: _Distortion2.default, Delay: _Delay2.default, Flanger: _Flanger2.default };
 	exports.default = Effects;
 
 /***/ },
@@ -13282,7 +13287,7 @@
 	    _delayNode = undefined;
 
 	/**
-	 * The pedalboard volume class.
+	 * The pedalboard delay class.
 	 * This class lets you add a delay effect.
 	 */
 
@@ -13418,6 +13423,215 @@
 	}(_MultiAudioNode3.default);
 
 	exports.default = Delay;
+	;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _MultiAudioNode2 = __webpack_require__(11);
+
+	var _MultiAudioNode3 = _interopRequireDefault(_MultiAudioNode2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	// "Private" varibles
+	var _inputGainNode = undefined,
+	    _delayNode = undefined,
+	    _wetGainNode = undefined,
+	    _gainNode = undefined,
+	    _feedbackGainNode = undefined,
+	    _oscillatorNode = undefined;
+
+	/**
+	 * The pedalboard flanger class.
+	 * This class lets you add a flanger effect.
+	 */
+
+	var Flanger = function (_MultiAudioNode) {
+	    _inherits(Flanger, _MultiAudioNode);
+
+	    function Flanger(audioContext) {
+	        _classCallCheck(this, Flanger);
+
+	        // Create the input gain-node
+
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Flanger).call(this, audioContext));
+
+	        _inputGainNode = audioContext.createGain();
+
+	        // Create the wetness controll gain-node
+	        _wetGainNode = audioContext.createGain();
+
+	        // Create the delay node
+	        _delayNode = audioContext.createDelay();
+
+	        // Create the gain controll gain-node
+	        _gainNode = audioContext.createGain();
+
+	        // Create the feedback controll gain-node
+	        _feedbackGainNode = audioContext.createGain();
+
+	        // Create the oscilator node
+	        _oscillatorNode = audioContext.createOscillator();
+	        _oscillatorNode.type = 'sine';
+	        _oscillatorNode.start(0);
+
+	        // Wire it all up
+	        _oscillatorNode.connect(_gainNode);
+	        _gainNode.connect(_delayNode.delayTime);
+	        _inputGainNode.connect(_wetGainNode);
+	        _inputGainNode.connect(_delayNode);
+	        _delayNode.connect(_wetGainNode);
+	        _delayNode.connect(_feedbackGainNode);
+	        _feedbackGainNode.connect(_inputGainNode);
+
+	        // Set the input gain-node as the input-node.
+	        _this._node = _inputGainNode;
+	        // Set the output gain-node as the output-node.
+	        _this._outputNode = _wetGainNode;
+
+	        // Set the default delay of 0.005 seconds
+	        _this.delay = 0.005;
+
+	        // Set the default depth to 0.002;
+	        _this.depth = 0.002;
+
+	        // Set the default feedback to 0.5
+	        _this.feedback = 0.5;
+
+	        // Set the default speed to 0.25Hz
+	        _this.speed = 0.25;
+	        return _this;
+	    }
+
+	    /**
+	     * Getter for the effect's delay
+	     * @return {Float}
+	     */
+
+	    _createClass(Flanger, [{
+	        key: 'delay',
+	        get: function get() {
+	            return this._delay;
+	        }
+
+	        /**
+	         * Setter for the effect's delay
+	         * @param  {Float} delay
+	         * @return {Float}
+	         */
+	        ,
+	        set: function set(delay) {
+	            // Set the internal delay value
+	            this._delay = parseFloat(delay);
+
+	            // Set the new value for the delay-node
+	            _delayNode.delayTime.value = this._delay;
+
+	            return this._delay;
+	        }
+
+	        /**
+	         * Getter for the effect's depth
+	         * @return {Float}
+	         */
+
+	    }, {
+	        key: 'depth',
+	        get: function get() {
+	            return this._depth;
+	        }
+
+	        /**
+	         * Setter for the effect's depth
+	         * @param  {Float} depth
+	         * @return {Float}
+	         */
+	        ,
+	        set: function set(depth) {
+	            // Set the internal depth value
+	            this._depth = parseFloat(depth);
+
+	            // Set the gain value of the gain-node
+	            _gainNode.gain.value = this._depth;
+
+	            return this._depth;
+	        }
+
+	        /**
+	         * Getter for the effect's feedback
+	         * @return {Float}
+	         */
+
+	    }, {
+	        key: 'feedback',
+	        get: function get() {
+	            return this._feedback;
+	        }
+
+	        /**
+	         * Setter for the effect's feedback
+	         * @param  {Float} feedback
+	         * @return {Float}
+	         */
+	        ,
+	        set: function set(feedback) {
+	            // Set the internal feedback value
+	            this._feedback = parseFloat(feedback);
+
+	            // Set the feedback gain-node value
+	            _feedbackGainNode.gain.value = this._feedback;
+
+	            return this._feedback;
+	        }
+
+	        /**
+	         * Getter for the effect's speed
+	         * @return {Float}
+	         */
+
+	    }, {
+	        key: 'speed',
+	        get: function get() {
+	            return this._speed;
+	        }
+
+	        /**
+	         * Setter for the effect's speed
+	         * @param  {Float} speed
+	         * @return {Float}
+	         */
+	        ,
+	        set: function set(speed) {
+	            // Set the internal speed value
+	            this._speed = parseFloat(speed);
+
+	            // Set the speed gain-node value
+	            _oscillatorNode.frequency.value = this._speed;
+
+	            return this._speed;
+	        }
+	    }]);
+
+	    return Flanger;
+	}(_MultiAudioNode3.default);
+
+	exports.default = Flanger;
 	;
 
 /***/ }

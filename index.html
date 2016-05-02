@@ -16,10 +16,11 @@
                 output = pedalboard.createOutput(),
                 volume = pedalboard.createVolume(),
                 distortion = pedalboard.createDistortion(),
-                delay = pedalboard.createDelay();
+                delay = pedalboard.createDelay(),
+                flanger = pedalboard.createFlanger();
 
             input.getUserMedia().then(function() {
-                input.connect(volume).connect(delay).connect(output);
+                input.connect(volume).connect(distortion).connect(flanger).connect(output);
             });
         }();
     </script>
