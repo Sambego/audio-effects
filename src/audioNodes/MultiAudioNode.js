@@ -33,11 +33,11 @@ export default class MultiAudioNode extends SingleAudioNode {
 
     /**
      * Connect the effect to other effects or native audio-nodes.
-     * @param  {Native AudioNode | Pedalboard AudioNode} node
-     * @return {Native AudioNode | Pedalboard AudioNode}
+     * @param  {Native AudioNode | Audio-effects AudioNode} node
+     * @return {Native AudioNode | Audio-effects AudioNode}
      */
     connect(node) {
-        // Check if the node is one created by pedalboard.js
+        // Check if the node is one created by audio-effects
         //  otherwise assume it's a native one.
         if (node.node) {
             this.output.connect(node.node);
@@ -50,7 +50,7 @@ export default class MultiAudioNode extends SingleAudioNode {
 
     /**
      * Disconnect the effect.
-     * @return {Pedalboard AudioNode}
+     * @return {Audio-effects AudioNode}
      */
     disconnect() {
         this.output.disconnect();

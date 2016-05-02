@@ -11,7 +11,7 @@ const _getInputResponseFile = function getInputResponseFile() {
 }
 
 /**
- * The pedalboard reverb class.
+ * The audio-effects reverb class.
  * This class lets you add a reverb effect.
  */
 export default class Reverb extends MultiAudioNode {

@@ -1,7 +1,7 @@
 import MultiAudioNode from '../MultiAudioNode';
 
 /**
- * The pedalboard flanger class.
+ * The audio-effects flanger class.
  * This class lets you add a flanger effect.
  */
 export default class Flanger extends MultiAudioNode {

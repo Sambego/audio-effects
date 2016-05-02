@@ -1,21 +1,27 @@
-# pedalboard.js
+# Audio-effects
 
-A javascript library to create guitar effects using the web-audio-api. This library contains the following effect:
+A javascript library to create audio effects using the web-audio-api. This library contains the following effect:
 - Volume
 - Distortion
 - Delay
 - Flanger
 - Reverb
 
-I will try to add more effect in the future.
+I will try to add more effects in the future.
 
 # API
 
-## Pedalboard
-To start create a new Pedalboard instance, this is the foundation.
+## Audio context
+To start, we need an audio-context, the audio-effect library has a useful helper function to check if the current browser supports the web-audio-api.
 
 ```javascript
-const pedalboard = new Pedalboard();
+import {HasAudioContext} from 'audio-effects';
+
+let audioContext = null;
+
+if (HasAudioContext) {
+    audioContext = new AudioContext();
+}
 ```
 
 ## Input
@@ -23,32 +29,38 @@ An input node manages the audio input.
 You can either supply an audio stream.
 
 ```javascript
-const stream = // Some audio stream
-      input = pedalboard.createInput();
-      input.input = stream;
+import {Input} from 'audio-effects';
 
+const stream = createAnAudioStream(); // Some audio stream
+const input = new Input(audioContext);
+      input.input = stream;
 ```
 
 Or use the `getUserMedia` method to access the devices microphone.
 
 ```javascript
-const input = pedalboard.createInput();
-      input.getUserMedia();
+import {Input} from 'audio-effects';
 
+const input = new Input(audioContext);
+      input.getUserMedia();
 ```
 
 ## Output
-This is the audio node which should be at the and of the chain, this connects our audio to the devices speakers.
+This is the audio node which should be at the end of the chain, this connects our audio to the device's speakers.
 
 ```javascript
-const output = pedalboard.createOutput();
+import {Output} from 'audio-effects';
+
+const output = new Output(audioContext);
 ```
 
 ## Volume
 Control the volume of your audio or mute it.
 
 ```javascript
-const volume = pedalboard.createVolume();
+import {Volume} from 'audio-effects';
+
+const volume = new Volume(audioContext);
       volume.level = 0.5; // Change the volume to 50%
       volume.mute = true; // Mute the volume
 ```
@@ -57,7 +69,9 @@ const volume = pedalboard.createVolume();
 Add a distortion effect
 
 ```javascript
-const distortion = pedalboard.createDistortion();
+import {Distortion} from 'audio-effects';
+
+const distortion = new Distortion(audioContext);
       distortion.intensity = 200; // Set the intensity to 200
       distortion.gain = 100; // Set the gain to 100
       distortion.lowPassFilter = true; // Enable the lowpass filter
@@ -67,7 +81,9 @@ const distortion = pedalboard.createDistortion();
 Add a delay effect
 
 ```javascript
-const delay = pedalboard.createDelay();
+import {Delay} from 'audio-effects';
+
+const delay = new Delay(audioContext);
       delay.wet = 1; // Set the wetness to 100%
       delay.speed = 1; // Set the speed to 1 second
       delay.duration = 0.4; // Set the delay duration to 40%
@@ -77,7 +93,9 @@ const delay = pedalboard.createDelay();
 Add a Flanger effect
 
 ```javascript
-const flanger = pedalboard.createFlanger();
+import {Flanger} from 'audio-effects';
+
+const flanger = new Flanger(audioContext);
       flanger.delay = 0.005; // Set the delay to 0.005 seconds
       flanger.depth = 0.002; // Set the depth to 0.002
       flanger.feedback = 0.5; // Set the feedback to 50%
@@ -88,7 +106,9 @@ const flanger = pedalboard.createFlanger();
 Add a Reverb effect
 
 ```javascript
-const reverb = pedalboard.createReverb()
+import {Reverb} from 'audio-effects';
+
+const reverb = new Reverb(audioContext)
       reverb.wet = 0.5; // Set the wetness to 50%
       reverb.level = 1; // Set the level to 100%
 ```
@@ -106,11 +126,11 @@ const irf = fetch('path/to/input-response-file', {
 
       // Option 1: pass it as a parameter when creating the reverb effect
       irf.then(buffer => {
-         const reverb = pedalboard.createReverb(buffer);
+         const reverb = new Reverb(audioContextbuffer);
       });
 
       // Option 2: set the buffer after creating the reverb effect
-      const reverb = pedalboard.createReverb();
+      const reverb = new Reverb(audioContext);
 
       irf.then(buffer => {
          reverb.buffer = buffer;
@@ -125,10 +145,65 @@ The api is the same as with normal audio nodes.
 input.connect(output);
 ```
 
-Unlike their native counterparts, pedalboard audio nodes can also be chained together.
+Unlike their native counterparts, audio-effects' audio nodes can also be chained together.
 
 ```javascript
 input.connect(volume).connect(distortion).connect(output);
+```
+## Helper functions
+The audio-effects library has some built-in helper functions.
+
+```javascript
+import {HasAudioContext, HasGetUserMedia} from 'audio-effects';
+
+if (HasAudioContext) {
+    // The current browser supports the web-audio-api.
+}
+
+if (HasGetUserMedia {
+    // The current browser supports getUserMedia.
+}
+```
+## Create your own effects
+It is possible to create your own effects.
+
+```javascript
+import {SingleAudioNode} from 'audio-effects';
+
+class CustomEffect extends SingleAudioNode {
+    constructor(audioContext) {
+        super(audioContext);
+
+        // All audio nodes needed for the effect should be kept in the nodes object.
+        this.nodes = {
+            node1: audioContext.createGain(),
+            node2: audioContext.createGain(),
+            node3: audioContext.createGain(),
+        };
+
+        // Connect all nodes
+        // [node 1]-->>--[node 2]-->>--[node 3]
+        this.nodes.node1.connect(this.nodes.node2);
+        this.nodes.node2.connect(this.nodes.node3);
+
+        // Set the  input-node, this is the first node in the effect's chain.
+        this._node = this.nodes.node1;
+
+        // Set the output-node, this is the last node in the effect's chain.
+        this._outputNode = this.nodes.node3;
+    }
+
+    // Create getters and setters for the parameters you want to be customizable.
+    get gain() {
+        return this.nodes.node1.gain.value;
+    }
+
+    set gain(gain) {
+        this.nodes.node1.gain.value = parseFloat(gain);
+    }
+
+    ...
+}
 ```
 
 # License

@@ -1,6 +1,6 @@
 module.exports = {
     entry: './src',
-    output: { path: __dirname + '/dist', filename: 'pedalboard.js' },
+    output: { path: __dirname + '/dist', filename: 'audio-effects.js' },
     module: {
         loaders: [
             {

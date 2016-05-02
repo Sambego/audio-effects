@@ -1,7 +1,7 @@
 import SingleAudioNode from '../SingleAudioNode';
 
 /**
- * The pedalboard output class.
+ * The audio-effects output class.
  * This class connects to your device's audio output.
  */
 export default class Output extends SingleAudioNode{

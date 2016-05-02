@@ -1,7 +1,7 @@
 import MultiAudioNode from '../MultiAudioNode';
 
 /**
- * The pedalboard delay class.
+ * The audio-effects delay class.
  * This class lets you add a delay effect.
  */
 export default class Delay extends MultiAudioNode {

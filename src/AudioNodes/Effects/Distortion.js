@@ -25,7 +25,7 @@ const _calculateDistortionCurve = function(intens) {
 };
 
 /**
- * The pedalboard distortion class.
+ * The audio-effects distortion class.
  * This class lets you add a distortion effect.
  */
 export default class Distortion extends MultiAudioNode {

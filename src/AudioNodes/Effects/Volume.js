@@ -1,7 +1,7 @@
 import SingleAudioNode from '../SingleAudioNode';
 
 /**
- * The pedalboard volume class.
+ * The audio-effects volume class.
  * This class lets you change the volume of the audio signal.
  */
 export default class Volume extends SingleAudioNode{

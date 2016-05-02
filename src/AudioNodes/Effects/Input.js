@@ -3,7 +3,7 @@ import SingleAudioNode from '../SingleAudioNode';
 import HasGetUserMedia from '../../helpers/HasGetUserMedia'
 
 /**
- * The pedalboard input node.
+ * The audio-effects input node.
  * This class lets you set an input audio source or access the  uses' microphone.
  */
 export default class Input extends SingleAudioNode {

@@ -1,6 +1,6 @@
 /**
  * The basic audio node class.
- * This is de skeleton for a pedalboard effect.
+ * This is de skeleton for a audio  effect.
  * When the effect only contains 1 audioNode this class can be used.
  */
 export default class AudioNode {
@@ -28,11 +28,11 @@ export default class AudioNode {
 
     /**
      * Connect the effect to other effects or native audio-nodes.
-     * @param  {Native AudioNode | Pedalboard AudioNode} node
-     * @return {Native AudioNode | Pedalboard AudioNode}
+     * @param  {Native AudioNode | Audio-effects AudioNode} node
+     * @return {Native AudioNode | Audio-effects AudioNode}
      */
     connect(node) {
-        // Check if the node is a Pedalboard AudioNode,
+        // Check if the node is a Audio-effects AudioNode,
         //  otherwise assume it's a native one.
         if (node.node) {
             this.node.connect(node.node);
@@ -45,7 +45,7 @@ export default class AudioNode {
 
     /**
      * disconnect the effect.
-     * @return {Pedalboard AudioNode}
+     * @return {Audio-effects AudioNode}
      */
     disconnect() {
         this.node.disconnect();
@@ -55,7 +55,7 @@ export default class AudioNode {
 
     /**
      * Alias for the disconnect method, to offer the same api as a MultiAudioNode.
-     * @return {Pedalboard AudioNode}
+     * @return {Audio-effects AudioNode}
      */
     destroy() {
         return this.disconnect();
