@@ -28,7 +28,7 @@ const _calculateDistortionCurve = function(intens) {
 };
 
 /**
- * The pedalboard volume class.
+ * The pedalboard distortion class.
  * This class lets you add a distortion effect.
  */
 export default class Distortion extends MultiAudioNode {
@@ -40,7 +40,7 @@ export default class Distortion extends MultiAudioNode {
         // Set the oversample value to 4x by default.
         _waveshaperNode.oversample = '4x'
 
-        // Create the gain-node we use to increase the gain.
+        // Create the gain-nodes we use to increase the gain.
         _gainNode = this._audioContext.createGain();
         _gainNode2 = this._audioContext.createGain();
 

@@ -69,6 +69,7 @@
 	 * - createOutput()
 	 * - createVolume()
 	 * - createDistortion()
+	 * - createDelay()
 	 *
 	 * @param  {Class}        pedalboard   The pedalboard class to create the methods on.
 	 * @param  {AudioContext} audioContext The audio-context which will be used by the method.
@@ -158,12 +159,16 @@
 
 	var _Distortion2 = _interopRequireDefault(_Distortion);
 
+	var _Delay = __webpack_require__(12);
+
+	var _Delay2 = _interopRequireDefault(_Delay);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	/**
 	 * Bundle all effects in one object.
 	 */
-	var Effects = { Input: _Input2.default, Output: _Output2.default, Volume: _Volume2.default, Distortion: _Distortion2.default };
+	var Effects = { Input: _Input2.default, Output: _Output2.default, Volume: _Volume2.default, Distortion: _Distortion2.default, Delay: _Delay2.default };
 	exports.default = Effects;
 
 /***/ },
@@ -13009,7 +13014,7 @@
 	};
 
 	/**
-	 * The pedalboard volume class.
+	 * The pedalboard distortion class.
 	 * This class lets you add a distortion effect.
 	 */
 
@@ -13027,7 +13032,7 @@
 	        // Set the oversample value to 4x by default.
 	        _waveshaperNode.oversample = '4x';
 
-	        // Create the gain-node we use to increase the gain.
+	        // Create the gain-nodes we use to increase the gain.
 	        _gainNode = _this._audioContext.createGain();
 	        _gainNode2 = _this._audioContext.createGain();
 
@@ -13243,6 +13248,176 @@
 	}(_SingleAudioNode3.default);
 
 	exports.default = MultiAudioNode;
+	;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _MultiAudioNode2 = __webpack_require__(11);
+
+	var _MultiAudioNode3 = _interopRequireDefault(_MultiAudioNode2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	// "Private" varibles
+	var _inputGainNode = undefined,
+	    _outputGainNode = undefined,
+	    _wetGainNode = undefined,
+	    _durationGainNode = undefined,
+	    _delayNode = undefined;
+
+	/**
+	 * The pedalboard volume class.
+	 * This class lets you add a delay effect.
+	 */
+
+	var Delay = function (_MultiAudioNode) {
+	    _inherits(Delay, _MultiAudioNode);
+
+	    function Delay(audioContext) {
+	        _classCallCheck(this, Delay);
+
+	        // Create the input and output nodes of the effect
+
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Delay).call(this, audioContext));
+
+	        _inputGainNode = audioContext.createGain();
+	        _outputGainNode = audioContext.createGain();
+
+	        // Create the gain-node we'll use to controll the wetness of the delay
+	        _wetGainNode = audioContext.createGain();
+
+	        // Create the gain node we'll use to controll the duration of the delay
+	        _durationGainNode = audioContext.createGain();
+
+	        // Create the delay node
+	        _delayNode = audioContext.createDelay();
+
+	        // Wire it all up
+	        _inputGainNode.connect(_wetGainNode);
+	        _inputGainNode.connect(_delayNode);
+	        _durationGainNode.connect(_delayNode);
+	        _delayNode.connect(_durationGainNode);
+	        _delayNode.connect(_outputGainNode);
+	        _wetGainNode.connect(_outputGainNode);
+
+	        // Set the input gain-node as the input-node.
+	        _this._node = _inputGainNode;
+	        // Set the output gain-node as the output-node.
+	        _this._outputNode = _outputGainNode;
+
+	        // Set the default wetness to 1
+	        _this.wet = 1;
+
+	        // Set the default speed to 1 second
+	        _this.speed = 1;
+
+	        // Set the default duration to 0.4
+	        _this.duration = 0.4;
+	        return _this;
+	    }
+
+	    /**
+	     * Getter for the effect's wetness
+	     * @return {Float}
+	     */
+
+	    _createClass(Delay, [{
+	        key: 'wet',
+	        get: function get() {
+	            return this._wet;
+	        }
+
+	        /**
+	         * Setter for the effect's wetness
+	         * @param  {Float} wetness
+	         * @return {Float}
+	         */
+	        ,
+	        set: function set(wetness) {
+	            // Set the internal wetness value
+	            this._wet = parseFloat(wetness);
+
+	            // Set the new value for the wetness controll gain-node
+	            _wetGainNode.gain.value = this._wet;
+
+	            return this._wet;
+	        }
+
+	        /**
+	         * Getter for the effect's speed
+	         * @return {Float}
+	         */
+
+	    }, {
+	        key: 'speed',
+	        get: function get() {
+	            return this._speed;
+	        }
+
+	        /**
+	         * Setter for the effect's speed
+	         * @param  {Float} speed
+	         * @return {Float}
+	         */
+	        ,
+	        set: function set(speed) {
+	            // Set the internal speed value
+	            this._speed = parseFloat(speed);
+
+	            // Set the delayTime value of the delay-node
+	            _delayNode.delayTime.value = this._speed;
+
+	            return this._speed;
+	        }
+
+	        /**
+	         * Getter for the effect's duration
+	         * @return {Float}
+	         */
+
+	    }, {
+	        key: 'duration',
+	        get: function get() {
+	            return this._duration;
+	        }
+
+	        /**
+	         * Setter for the effect's duration
+	         * @param  {Float} duration
+	         * @return {Float}
+	         */
+	        ,
+	        set: function set(duration) {
+	            // Set the internal duration value
+	            this._duration = parseFloat(duration);
+
+	            // Set the duration gain-node value
+	            _durationGainNode.gain.value = this._duration;
+
+	            return this._duration;
+	        }
+	    }]);
+
+	    return Delay;
+	}(_MultiAudioNode3.default);
+
+	exports.default = Delay;
 	;
 
 /***/ }

@@ -8,6 +8,7 @@ import Effects from './audioNodes/Effects';
  * - createOutput()
  * - createVolume()
  * - createDistortion()
+ * - createDelay()
  *
  * @param  {Class}        pedalboard   The pedalboard class to create the methods on.
  * @param  {AudioContext} audioContext The audio-context which will be used by the method.

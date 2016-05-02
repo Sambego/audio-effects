@@ -15,10 +15,11 @@
             var input = pedalboard.createInput(),
                 output = pedalboard.createOutput(),
                 volume = pedalboard.createVolume(),
-                distortion = pedalboard.createDistortion();
+                distortion = pedalboard.createDistortion(),
+                delay = pedalboard.createDelay();
 
             input.getUserMedia().then(function() {
-                input.connect(volume).connect(distortion).connect(output);
+                input.connect(volume).connect(delay).connect(output);
             });
         }();
     </script>
