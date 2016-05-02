@@ -1,5 +1,4 @@
 # pedalboard.js
-=====================
 
 A javascript library to create guitar effects using the web-audio-api. This library contains the following effect:
 - Volume
@@ -11,7 +10,6 @@ A javascript library to create guitar effects using the web-audio-api. This libr
 I will try to add more effect in the future.
 
 # API
-=====================
 
 ## Pedalboard
 To start create a new Pedalboard instance, this is the foundation.
@@ -134,7 +132,6 @@ input.connect(volume).connect(distortion).connect(output);
 ```
 
 # License
-=====================
 
 ## The MIT License (MIT)
 
