@@ -118,7 +118,7 @@ const reverb = new Reverb(audioContext)
       reverb.level = 1; // Set the level to 100%
 ```
 
-By default the reverb effect will use the hall-reverb input response file from the awesome (web-audio-playground)[https://github.com/cwilso/WebAudio] by Chris Wilson.
+By default the reverb effect will use the hall-reverb input response file from the awesome [web-audio-playground](https://github.com/cwilso/WebAudio) by Chris Wilson.
 
 if you want to use your own input response file you can configure it in 2 ways:
 
