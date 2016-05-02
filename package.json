@@ -19,12 +19,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Sambego/pedalboard.js.git"
+    "url": "git+https://github.com/Sambego/audio-effects.git"
   },
   "author": "Sam Bellen",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Sambego/pedalboard.js/issues"
+    "url": "https://github.com/Sambego/audio-effects/issues"
   },
-  "homepage": "https://github.com/Sambego/pedalboard.js#readme"
+  "homepage": "https://github.com/Sambego/audio-effects#readme"
 }
