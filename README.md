@@ -131,7 +131,7 @@ const irf = fetch('path/to/input-response-file', {
 
       // Option 1: pass it as a parameter when creating the reverb effect
       irf.then(buffer => {
-         const reverb = new Reverb(audioContextbuffer);
+         const reverb = new Reverb(audioContext, buffer);
       });
 
       // Option 2: set the buffer after creating the reverb effect
