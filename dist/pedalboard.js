@@ -12871,7 +12871,7 @@
 	        _this.node = _this._audioContext.createGain();
 
 	        // The initial volume level is 100%.
-	        _this.level = _this._levelBeforeMute = 1;
+	        _this.level = 1;
 
 	        // The effect is not muted by default.
 	        _this.mute = false;
@@ -12932,7 +12932,7 @@
 	                this.level = 0;
 	            } else {
 	                // Set the volume to the previous volume.
-	                this.level = this._levelBeforeMute;
+	                this.level = this._levelBeforeMute || 1;
 	            }
 
 	            return this._mute;
@@ -12992,12 +12992,11 @@
 	 * @return {Float32Array}
 	 */
 	var _calculateDistortionCurve = function _calculateDistortionCurve(intens) {
-	    var intensity = intens || 150,
+	    var intensity = parseInt(intens) || 100,
 	        amount = 44100,
-	        deg = Math.PI / 180;
-
-	    var curve = new Float32Array(amount),
-	        i = 0,
+	        deg = Math.PI / 180,
+	        curve = new Float32Array(amount);
+	    var i = 0,
 	        x = undefined;
 
 	    for (; i < amount; ++i) {
@@ -13046,11 +13045,11 @@
 	        // Set the biquad-filter-node as the output-node.
 	        _this._outputNode = _biquadFilterNode;
 
-	        // The default intensity is 150.
-	        _this.intensity = 150;
-	        // The default gain is 120.
-	        _this.gain = 120;
-	        // The lowpass filter is turned off by default.
+	        // The default intensity is 100.
+	        _this.intensity = 100;
+	        // The default gain is 1.
+	        _this.gain = 1;
+	        // // The lowpass filter is turned off by default.
 	        _this.lowPassFilter = false;
 	        return _this;
 	    }

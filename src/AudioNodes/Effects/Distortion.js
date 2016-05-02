@@ -12,12 +12,11 @@ let _waveshaperNode, _gainNode, _biquadFilterNode;
  * @return {Float32Array}
  */
 const _calculateDistortionCurve = function(intens) {
-    const intensity = intens || 150,
+    const intensity = parseInt(intens) || 100,
         amount = 44100,
-        deg = Math.PI / 180;
-
-    let curve = new Float32Array(amount),
-        i = 0,
+        deg = Math.PI / 180,
+        curve = new Float32Array(amount);
+    let i = 0,
         x;
 
     for (; i < amount; ++i ) {
@@ -60,11 +59,11 @@ export default class Distortion extends MultiAudioNode {
         // Set the biquad-filter-node as the output-node.
         this._outputNode = _biquadFilterNode;
 
-        // The default intensity is 150.
-        this.intensity = 150;
-        // The default gain is 120.
-        this.gain = 120;
-        // The lowpass filter is turned off by default.
+        // The default intensity is 100.
+        this.intensity = 100;
+        // The default gain is 1.
+        this.gain = 1;
+        // // The lowpass filter is turned off by default.
         this.lowPassFilter = false;
     }
 
