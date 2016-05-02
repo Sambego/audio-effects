@@ -1,6 +1,6 @@
 {
   "name": "pedalboard",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A javascript library to create guitar effects using the web-audio-api",
   "main": "src/index.js",
   "dependencies": {},
