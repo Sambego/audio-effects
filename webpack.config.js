@@ -12,7 +12,8 @@ module.exports = {
                 }
             },{
                 test: /\.ogg/,
-                include: __dirname + '/src/audio'
+                loader: 'file',
+                include: __dirname + '/src/audio',
             }
         ]
     },

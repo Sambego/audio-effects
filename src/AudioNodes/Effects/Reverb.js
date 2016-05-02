@@ -1,8 +1,9 @@
 import MultiAudioNode from '../MultiAudioNode';
+import irf from 'file!../../audio/hall-reverb.ogg';
 
 // Load the input response file
 const _getInputResponseFile = function getInputResponseFile() {
-    return fetch('../../audio/hall-reverb.ogg', {
+    return fetch(irf, {
         method: 'get'
     }).then(response => {
         return response.arrayBuffer();

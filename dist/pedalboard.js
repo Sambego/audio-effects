@@ -13656,6 +13656,10 @@
 
 	var _MultiAudioNode3 = _interopRequireDefault(_MultiAudioNode2);
 
+	var _hallReverb = __webpack_require__(15);
+
+	var _hallReverb2 = _interopRequireDefault(_hallReverb);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -13666,7 +13670,7 @@
 
 	// Load the input response file
 	var _getInputResponseFile = function getInputResponseFile() {
-	    return fetch('../../audio/hall-reverb.ogg', {
+	    return fetch(_hallReverb2.default, {
 	        method: 'get'
 	    }).then(function (response) {
 	        return response.arrayBuffer();
@@ -13818,6 +13822,12 @@
 
 	exports.default = Reverb;
 	;
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__.p + "18817a3aeebbdd2baf9107fb2d7101cd.ogg";
 
 /***/ }
 /******/ ]);
