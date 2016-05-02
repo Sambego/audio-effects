@@ -211,6 +211,11 @@ class CustomEffect extends SingleAudioNode {
 }
 ```
 
+# Todo
+[ ] Write tests!
+[ ] Add tuner
+
+
 # License
 
 ## The MIT License (MIT)
