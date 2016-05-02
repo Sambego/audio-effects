@@ -12997,12 +12997,6 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	// "Private" varibles
-	var _waveshaperNode = undefined,
-	    _gainNode = undefined,
-	    _gainNode2 = undefined,
-	    _biquadFilterNode = undefined;
-
 	/**
 	 * Calculate a distortion curve.
 	 *
@@ -13038,34 +13032,33 @@
 	    function Distortion(audioContext) {
 	        _classCallCheck(this, Distortion);
 
-	        // Create the waveshaper-node we'll use to create the distortion effect.
-
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Distortion).call(this, audioContext));
 
-	        _waveshaperNode = _this._audioContext.createWaveShaper();
+	        _this.nodes = {
+	            waveshaper: _this._audioContext.createWaveShaper(), // Create the waveshaper-node we'll use to create the distortion effect.
+	            gainNode: _this._audioContext.createGain(), // Create the gain-nodes we use to increase the gain.
+	            gainNode2: _this._audioContext.createGain(),
+	            biquadFilterNode: _this._audioContext.createBiquadFilter() // Create the biquad-filter-node we'll use to create a lowpass filter.
+	        };
+
 	        // Set the oversample value to 4x by default.
-	        _waveshaperNode.oversample = '4x';
+	        _this.nodes.waveshaper.oversample = '4x';
 
-	        // Create the gain-nodes we use to increase the gain.
-	        _gainNode = _this._audioContext.createGain();
-	        _gainNode2 = _this._audioContext.createGain();
-
-	        // Create the biquad-filter-node we'll use to create a lowpass filter.
-	        _biquadFilterNode = _this._audioContext.createBiquadFilter();
 	        // Set the type of to lowpass by default.
-	        _biquadFilterNode.type = 'lowpass';
+	        _this.nodes.biquadFilterNode.type = 'lowpass';
+
 	        // Set the frequency value to 2000 by default.
-	        _biquadFilterNode.frequency.value = 2000;
+	        _this.nodes.biquadFilterNode.frequency.value = 2000;
 
 	        // Connect all nodes together
-	        _waveshaperNode.connect(_gainNode);
-	        _gainNode.connect(_gainNode2);
-	        _gainNode2.connect(_biquadFilterNode);
+	        _this.nodes.waveshaper.connect(_this.nodes.gainNode);
+	        _this.nodes.gainNode.connect(_this.nodes.gainNode2);
+	        _this.nodes.gainNode2.connect(_this.nodes.biquadFilterNode);
 
 	        // Set the waveshaper-node as the input-node.
-	        _this._node = _waveshaperNode;
+	        _this._node = _this.nodes.waveshaper;
 	        // Set the biquad-filter-node as the output-node.
-	        _this._outputNode = _biquadFilterNode;
+	        _this._outputNode = _this.nodes.biquadFilterNode;
 
 	        // The default intensity is 100.
 	        _this.intensity = 100;
@@ -13097,7 +13090,7 @@
 	            // Set the internal intensity value.
 	            this._intensity = parseInt(intensity);
 	            // Set the new curve of the waveshaper-node
-	            _waveshaperNode.curve = _calculateDistortionCurve(this._intensity);
+	            this.nodes.waveshaper.curve = _calculateDistortionCurve(this._intensity);
 
 	            return this._intensity;
 	        }
@@ -13124,8 +13117,8 @@
 	            this._gain = parseFloat(gain);
 
 	            // Set the gain-node's gain value.
-	            _gainNode.gain.value = this._gain;
-	            _gainNode2.gain.value = 1 / this._gain;
+	            this.nodes.gainNode.gain.value = this._gain;
+	            this.nodes.gainNode2.gain.value = 1 / this._gain;
 
 	            return this._gain;
 	        }
@@ -13151,7 +13144,7 @@
 	            // Set the internal lowpass filter value.
 	            this._lowPassFilter = !!lowPassFilter;
 	            // Set the biquad-filter-node's frequency.
-	            _biquadFilterNode.frequency.value = this._lowPassFilter ? 2000 : 1000;
+	            this.nodes.biquadFilterNode.frequency.value = this._lowPassFilter ? 2000 : 1000;
 
 	            return this._lowPassFilter;
 	        }
@@ -13198,11 +13191,19 @@
 	var MultiAudioNode = function (_SingleAudioNode) {
 	    _inherits(MultiAudioNode, _SingleAudioNode);
 
-	    function MultiAudioNode() {
+	    function MultiAudioNode(audioContext) {
 	        _classCallCheck(this, MultiAudioNode);
 
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(MultiAudioNode).apply(this, arguments));
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(MultiAudioNode).call(this, audioContext));
+
+	        _this.nodes = {};
+	        return _this;
 	    }
+
+	    /**
+	     * Getter for the effects output node.
+	     * @return {AudioNode}
+	     */
 
 	    _createClass(MultiAudioNode, [{
 	        key: 'connect',
@@ -13232,17 +13233,21 @@
 	    }, {
 	        key: 'disconnect',
 	        value: function disconnect() {
+	            var _this2 = this;
+
 	            this.output.disconnect();
+
+	            Object.keys(this.nodes).forEach(function (node) {
+	                if (_this2.nodes[node].disconnect && typeof _this2.nodes[node].disconnect === 'function') {
+	                    console.log(_this2.nodes[node]);
+	                    _this2.nodes[node].disconnect();
+	                }
+	            });
 
 	            return this.output;
 	        }
 	    }, {
 	        key: 'output',
-
-	        /**
-	         * Getter for the effects output node.
-	         * @return {AudioNode}
-	         */
 	        get: function get() {
 	            return this._outputNode;
 	        }
@@ -13288,13 +13293,6 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	// "Private" varibles
-	var _inputGainNode = undefined,
-	    _outputGainNode = undefined,
-	    _wetGainNode = undefined,
-	    _durationGainNode = undefined,
-	    _delayNode = undefined;
-
 	/**
 	 * The pedalboard delay class.
 	 * This class lets you add a delay effect.
@@ -13306,34 +13304,28 @@
 	    function Delay(audioContext) {
 	        _classCallCheck(this, Delay);
 
-	        // Create the input and output nodes of the effect
-
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Delay).call(this, audioContext));
 
-	        _inputGainNode = audioContext.createGain();
-	        _outputGainNode = audioContext.createGain();
-
-	        // Create the gain-node we'll use to controll the wetness of the delay
-	        _wetGainNode = audioContext.createGain();
-
-	        // Create the gain node we'll use to controll the duration of the delay
-	        _durationGainNode = audioContext.createGain();
-
-	        // Create the delay node
-	        _delayNode = audioContext.createDelay();
+	        _this.nodes = {
+	            inputGainNode: audioContext.createGain(), // Create the input and output nodes of the effect
+	            outputGainNode: audioContext.createGain(),
+	            wetGainNode: audioContext.createGain(), // Create the gain-node we'll use to controll the wetness of the delay
+	            durationGainNode: audioContext.createGain(), // Create the gain node we'll use to controll the duration of the delay
+	            delayNode: audioContext.createDelay() // Create the delay node
+	        };
 
 	        // Wire it all up
-	        _inputGainNode.connect(_wetGainNode);
-	        _inputGainNode.connect(_delayNode);
-	        _durationGainNode.connect(_delayNode);
-	        _delayNode.connect(_durationGainNode);
-	        _delayNode.connect(_outputGainNode);
-	        _wetGainNode.connect(_outputGainNode);
+	        _this.nodes.inputGainNode.connect(_this.nodes.wetGainNode);
+	        _this.nodes.inputGainNode.connect(_this.nodes.delayNode);
+	        _this.nodes.durationGainNode.connect(_this.nodes.delayNode);
+	        _this.nodes.delayNode.connect(_this.nodes.durationGainNode);
+	        _this.nodes.delayNode.connect(_this.nodes.outputGainNode);
+	        _this.nodes.wetGainNode.connect(_this.nodes.outputGainNode);
 
 	        // Set the input gain-node as the input-node.
-	        _this._node = _inputGainNode;
+	        _this._node = _this.nodes.inputGainNode;
 	        // Set the output gain-node as the output-node.
-	        _this._outputNode = _outputGainNode;
+	        _this._outputNode = _this.nodes.outputGainNode;
 
 	        // Set the default wetness to 1
 	        _this.wet = 1;
@@ -13368,7 +13360,7 @@
 	            this._wet = parseFloat(wetness);
 
 	            // Set the new value for the wetness controll gain-node
-	            _wetGainNode.gain.value = this._wet;
+	            this.nodes.wetGainNode.gain.value = this._wet;
 
 	            return this._wet;
 	        }
@@ -13395,7 +13387,7 @@
 	            this._speed = parseFloat(speed);
 
 	            // Set the delayTime value of the delay-node
-	            _delayNode.delayTime.value = this._speed;
+	            this.nodes.delayNode.delayTime.value = this._speed;
 
 	            return this._speed;
 	        }
@@ -13422,7 +13414,7 @@
 	            this._duration = parseFloat(duration);
 
 	            // Set the duration gain-node value
-	            _durationGainNode.gain.value = this._duration;
+	            this.nodes.durationGainNode.gain.value = this._duration;
 
 	            return this._duration;
 	        }
@@ -13458,14 +13450,6 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	// "Private" varibles
-	var _inputGainNode = undefined,
-	    _delayNode = undefined,
-	    _wetGainNode = undefined,
-	    _gainNode = undefined,
-	    _feedbackGainNode = undefined,
-	    _oscillatorNode = undefined;
-
 	/**
 	 * The pedalboard flanger class.
 	 * This class lets you add a flanger effect.
@@ -13477,42 +13461,35 @@
 	    function Flanger(audioContext) {
 	        _classCallCheck(this, Flanger);
 
-	        // Create the input gain-node
-
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Flanger).call(this, audioContext));
 
-	        _inputGainNode = audioContext.createGain();
-
-	        // Create the wetness controll gain-node
-	        _wetGainNode = audioContext.createGain();
-
-	        // Create the delay node
-	        _delayNode = audioContext.createDelay();
-
-	        // Create the gain controll gain-node
-	        _gainNode = audioContext.createGain();
-
-	        // Create the feedback controll gain-node
-	        _feedbackGainNode = audioContext.createGain();
-
-	        // Create the oscilator node
-	        _oscillatorNode = audioContext.createOscillator();
-	        _oscillatorNode.type = 'sine';
-	        _oscillatorNode.start(0);
+	        _this.nodes = {
+	            inputGainNode: audioContext.createGain(), // Create the input gain-node
+	            wetGainNode: audioContext.createGain(), // Create the wetness controll gain-node
+	            delayNode: audioContext.createDelay(), // Create the delay node
+	            gainNode: audioContext.createGain(), // Create the gain controll gain-node
+	            feedbackGainNode: audioContext.createGain(), // Create the feedback controll gain-node
+	            oscillatorNode: audioContext.createOscillator() // Create the oscilator node
+	        };
 
 	        // Wire it all up
-	        _oscillatorNode.connect(_gainNode);
-	        _gainNode.connect(_delayNode.delayTime);
-	        _inputGainNode.connect(_wetGainNode);
-	        _inputGainNode.connect(_delayNode);
-	        _delayNode.connect(_wetGainNode);
-	        _delayNode.connect(_feedbackGainNode);
-	        _feedbackGainNode.connect(_inputGainNode);
+	        _this.nodes.oscillatorNode.connect(_this.nodes.gainNode);
+	        _this.nodes.gainNode.connect(_this.nodes.delayNode.delayTime);
+	        _this.nodes.inputGainNode.connect(_this.nodes.wetGainNode);
+	        _this.nodes.inputGainNode.connect(_this.nodes.delayNode);
+	        _this.nodes.delayNode.connect(_this.nodes.wetGainNode);
+	        _this.nodes.delayNode.connect(_this.nodes.feedbackGainNode);
+	        _this.nodes.feedbackGainNode.connect(_this.nodes.inputGainNode);
+
+	        // Setup the oscillator
+	        _this.nodes.oscillatorNode.type = 'sine';
+	        _this.nodes.oscillatorNode.start(0);
 
 	        // Set the input gain-node as the input-node.
-	        _this._node = _inputGainNode;
+	        _this._node = _this.nodes.inputGainNode;
+
 	        // Set the output gain-node as the output-node.
-	        _this._outputNode = _wetGainNode;
+	        _this._outputNode = _this.nodes.wetGainNode;
 
 	        // Set the default delay of 0.005 seconds
 	        _this.delay = 0.005;
@@ -13550,7 +13527,7 @@
 	            this._delay = parseFloat(delay);
 
 	            // Set the new value for the delay-node
-	            _delayNode.delayTime.value = this._delay;
+	            this.nodes.delayNode.delayTime.value = this._delay;
 
 	            return this._delay;
 	        }
@@ -13577,7 +13554,7 @@
 	            this._depth = parseFloat(depth);
 
 	            // Set the gain value of the gain-node
-	            _gainNode.gain.value = this._depth;
+	            this.nodes.gainNode.gain.value = this._depth;
 
 	            return this._depth;
 	        }
@@ -13604,7 +13581,7 @@
 	            this._feedback = parseFloat(feedback);
 
 	            // Set the feedback gain-node value
-	            _feedbackGainNode.gain.value = this._feedback;
+	            this.nodes.feedbackGainNode.gain.value = this._feedback;
 
 	            return this._feedback;
 	        }
@@ -13631,7 +13608,7 @@
 	            this._speed = parseFloat(speed);
 
 	            // Set the speed gain-node value
-	            _oscillatorNode.frequency.value = this._speed;
+	            this.nodes.oscillatorNode.frequency.value = this._speed;
 
 	            return this._speed;
 	        }
@@ -13667,16 +13644,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	// "Private" varibles
-	var _inputGainNode = undefined,
-	    _convolverNode = undefined,
-	    _wetGainNode = undefined,
-	    _levelGainNode = undefined,
-	    _outputGainNode = undefined;
-
 	// Load the input response file
 	var _getInputResponseFile = function getInputResponseFile() {
-	    return fetch('src/audio/hall-reverb.ogg', {
+	    return fetch('./src/audio/hall-reverb.ogg', {
 	        method: 'get'
 	    }).then(function (response) {
 	        return response.arrayBuffer();
@@ -13700,30 +13670,25 @@
 
 	        _this.audioContext = audioContext;
 
-	        // Create the input and output gain-node
-	        _inputGainNode = audioContext.createGain();
-	        _outputGainNode = audioContext.createGain();
-
-	        // Create the convolver node to create the reverb effect
-	        _convolverNode = audioContext.createConvolver();
-
-	        // Create the wetness controll gain-node
-	        _wetGainNode = audioContext.createGain();
-
-	        // Create the level controll gain-node
-	        _levelGainNode = audioContext.createGain();
+	        _this.nodes = {
+	            inputGainNode: audioContext.createGain(), // Create the input and output gain-node
+	            outputGainNode: audioContext.createGain(),
+	            convolverNode: audioContext.createConvolver(), // Create the convolver node to create the reverb effect
+	            wetGainNode: audioContext.createGain(), // Create the wetness controll gain-node
+	            levelGainNode: audioContext.createGain() // Create the level controll gain-node
+	        };
 
 	        // Wire it all up
-	        _inputGainNode.connect(_convolverNode);
-	        _inputGainNode.connect(_wetGainNode);
-	        _convolverNode.connect(_levelGainNode);
-	        _levelGainNode.connect(_outputGainNode);
-	        _wetGainNode.connect(_outputGainNode);
+	        _this.nodes.inputGainNode.connect(_this.nodes.convolverNode);
+	        _this.nodes.inputGainNode.connect(_this.nodes.wetGainNode);
+	        _this.nodes.convolverNode.connect(_this.nodes.levelGainNode);
+	        _this.nodes.levelGainNode.connect(_this.nodes.outputGainNode);
+	        _this.nodes.wetGainNode.connect(_this.nodes.outputGainNode);
 
 	        // Set the input gain-node as the input-node.
-	        _this._node = _inputGainNode;
+	        _this._node = _this.nodes.inputGainNode;
 	        // Set the output gain-node as the output-node.
-	        _this._outputNode = _outputGainNode;
+	        _this._outputNode = _this.nodes.outputGainNode;
 
 	        // Set the default wetness to 0.5
 	        _this.wet = 0.5;
@@ -13764,7 +13729,7 @@
 	            this._wet = parseFloat(wetness);
 
 	            // Set the new value for the wetness controll gain-node
-	            _wetGainNode.gain.value = this._wet;
+	            this.nodes.wetGainNode.gain.value = this._wet;
 
 	            return this._wet;
 	        }
@@ -13791,7 +13756,7 @@
 	            this._level = parseFloat(level);
 
 	            // Set the delayTime value of the delay-node
-	            _levelGainNode.gain.value = this._level;
+	            this.nodes.levelGainNode.gain.value = this._level;
 
 	            return this._level;
 	        }
@@ -13821,7 +13786,7 @@
 	                _this2._buffer = buffer;
 
 	                // Set the buffer gain-node value
-	                _convolverNode.buffer = _this2._buffer;
+	                _this2.nodes.convolverNode.buffer = _this2._buffer;
 
 	                return _this2._buffer;
 	            });

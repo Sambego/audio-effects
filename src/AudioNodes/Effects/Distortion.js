@@ -1,8 +1,5 @@
 import MultiAudioNode from '../MultiAudioNode';
 
-// "Private" varibles
-let _waveshaperNode, _gainNode, _gainNode2, _biquadFilterNode;
-
 /**
  * Calculate a distortion curve.
  *
@@ -35,31 +32,31 @@ export default class Distortion extends MultiAudioNode {
     constructor(audioContext) {
         super(audioContext);
 
-        // Create the waveshaper-node we'll use to create the distortion effect.
-        _waveshaperNode = this._audioContext.createWaveShaper();
+        this.nodes = {
+            waveshaper: this._audioContext.createWaveShaper(), // Create the waveshaper-node we'll use to create the distortion effect.
+            gainNode: this._audioContext.createGain(), // Create the gain-nodes we use to increase the gain.
+            gainNode2: this._audioContext.createGain(),
+            biquadFilterNode: this._audioContext.createBiquadFilter() // Create the biquad-filter-node we'll use to create a lowpass filter.
+        };
+
         // Set the oversample value to 4x by default.
-        _waveshaperNode.oversample = '4x'
+        this.nodes.waveshaper.oversample = '4x'
 
-        // Create the gain-nodes we use to increase the gain.
-        _gainNode = this._audioContext.createGain();
-        _gainNode2 = this._audioContext.createGain();
-
-        // Create the biquad-filter-node we'll use to create a lowpass filter.
-        _biquadFilterNode = this._audioContext.createBiquadFilter();
         // Set the type of to lowpass by default.
-        _biquadFilterNode.type = 'lowpass';
+        this.nodes.biquadFilterNode.type = 'lowpass';
+
         // Set the frequency value to 2000 by default.
-        _biquadFilterNode.frequency.value = 2000;
+        this.nodes.biquadFilterNode.frequency.value = 2000;
 
         // Connect all nodes together
-        _waveshaperNode.connect(_gainNode);
-        _gainNode.connect(_gainNode2);
-        _gainNode2.connect(_biquadFilterNode);
+        this.nodes.waveshaper.connect(this.nodes.gainNode);
+        this.nodes.gainNode.connect(this.nodes.gainNode2);
+        this.nodes.gainNode2.connect(this.nodes.biquadFilterNode);
 
         // Set the waveshaper-node as the input-node.
-        this._node = _waveshaperNode;
+        this._node = this.nodes.waveshaper;
         // Set the biquad-filter-node as the output-node.
-        this._outputNode = _biquadFilterNode;
+        this._outputNode = this.nodes.biquadFilterNode;
 
         // The default intensity is 100.
         this.intensity = 100;
@@ -86,7 +83,7 @@ export default class Distortion extends MultiAudioNode {
         // Set the internal intensity value.
         this._intensity = parseInt(intensity)
         // Set the new curve of the waveshaper-node
-        _waveshaperNode.curve = _calculateDistortionCurve(this._intensity);
+        this.nodes.waveshaper.curve = _calculateDistortionCurve(this._intensity);
 
         return this._intensity;
     }
@@ -109,8 +106,8 @@ export default class Distortion extends MultiAudioNode {
         this._gain = parseFloat(gain);
 
         // Set the gain-node's gain value.
-        _gainNode.gain.value = this._gain;
-        _gainNode2.gain.value = 1 / this._gain;
+        this.nodes.gainNode.gain.value = this._gain;
+        this.nodes.gainNode2.gain.value = 1 / this._gain;
 
         return this._gain;
     }
@@ -132,7 +129,7 @@ export default class Distortion extends MultiAudioNode {
         // Set the internal lowpass filter value.
         this._lowPassFilter = !!lowPassFilter;
         // Set the biquad-filter-node's frequency.
-        _biquadFilterNode.frequency.value = (this._lowPassFilter ? 2000 : 1000)
+        this.nodes.biquadFilterNode.frequency.value = (this._lowPassFilter ? 2000 : 1000)
 
         return this._lowPassFilter;
     }

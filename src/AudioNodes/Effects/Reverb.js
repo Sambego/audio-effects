@@ -1,11 +1,8 @@
 import MultiAudioNode from '../MultiAudioNode';
 
-// "Private" varibles
-let _inputGainNode, _convolverNode, _wetGainNode, _levelGainNode, _outputGainNode;
-
 // Load the input response file
 const _getInputResponseFile = function getInputResponseFile() {
-    return fetch('src/audio/hall-reverb.ogg', {
+    return fetch('./src/audio/hall-reverb.ogg', {
         method: 'get'
     }).then(response => {
         return response.arrayBuffer();
@@ -23,30 +20,25 @@ export default class Reverb extends MultiAudioNode {
         // Set the audioContext
         this.audioContext = audioContext;
 
-        // Create the input and output gain-node
-        _inputGainNode = audioContext.createGain();
-        _outputGainNode = audioContext.createGain();
-
-        // Create the convolver node to create the reverb effect
-        _convolverNode = audioContext.createConvolver();
-
-        // Create the wetness controll gain-node
-        _wetGainNode = audioContext.createGain();
-
-        // Create the level controll gain-node
-        _levelGainNode = audioContext.createGain();
+        this.nodes = {
+            inputGainNode: audioContext.createGain(), // Create the input and output gain-node
+            outputGainNode: audioContext.createGain(),
+            convolverNode: audioContext.createConvolver(), // Create the convolver node to create the reverb effect
+            wetGainNode: audioContext.createGain(), // Create the wetness controll gain-node
+            levelGainNode: audioContext.createGain() // Create the level controll gain-node
+        };
 
         // Wire it all up
-        _inputGainNode.connect(_convolverNode);
-        _inputGainNode.connect(_wetGainNode);
-        _convolverNode.connect(_levelGainNode);
-        _levelGainNode.connect(_outputGainNode);
-        _wetGainNode.connect(_outputGainNode);
+        this.nodes.inputGainNode.connect(this.nodes.convolverNode);
+        this.nodes.inputGainNode.connect(this.nodes.wetGainNode);
+        this.nodes.convolverNode.connect(this.nodes.levelGainNode);
+        this.nodes.levelGainNode.connect(this.nodes.outputGainNode);
+        this.nodes.wetGainNode.connect(this.nodes.outputGainNode);
 
         // Set the input gain-node as the input-node.
-        this._node = _inputGainNode;
+        this._node = this.nodes.inputGainNode;
         // Set the output gain-node as the output-node.
-        this._outputNode = _outputGainNode;
+        this._outputNode = this.nodes.outputGainNode;
 
         // Set the default wetness to 0.5
         this.wet = 0.5;
@@ -82,7 +74,7 @@ export default class Reverb extends MultiAudioNode {
         this._wet = parseFloat(wetness);
 
         // Set the new value for the wetness controll gain-node
-        _wetGainNode.gain.value = this._wet;
+        this.nodes.wetGainNode.gain.value = this._wet;
 
         return this._wet;
     }
@@ -105,7 +97,7 @@ export default class Reverb extends MultiAudioNode {
         this._level = parseFloat(level);
 
         // Set the delayTime value of the delay-node
-        _levelGainNode.gain.value = this._level;
+        this.nodes.levelGainNode.gain.value = this._level;
 
         return this._level;
     }
@@ -129,7 +121,7 @@ export default class Reverb extends MultiAudioNode {
             this._buffer = buffer;
 
             // Set the buffer gain-node value
-            _convolverNode.buffer = this._buffer;
+            this.nodes.convolverNode.buffer = this._buffer;
 
             return this._buffer;
         });

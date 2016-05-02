@@ -52,4 +52,12 @@ export default class AudioNode {
 
         return this.node;
     }
+
+    /**
+     * Alias for the disconnect method, to offer the same api as a MultiAudioNode.
+     * @return {Pedalboard AudioNode}
+     */
+    destroy() {
+        return this.disconnect();
+    }
 };

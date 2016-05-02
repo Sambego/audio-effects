@@ -1,8 +1,5 @@
 import MultiAudioNode from '../MultiAudioNode';
 
-// "Private" varibles
-let _inputGainNode, _outputGainNode, _wetGainNode, _durationGainNode, _delayNode;
-
 /**
  * The pedalboard delay class.
  * This class lets you add a delay effect.
@@ -11,31 +8,26 @@ export default class Delay extends MultiAudioNode {
     constructor(audioContext) {
         super(audioContext);
 
-        // Create the input and output nodes of the effect
-        _inputGainNode = audioContext.createGain();
-        _outputGainNode = audioContext.createGain();
-
-        // Create the gain-node we'll use to controll the wetness of the delay
-        _wetGainNode = audioContext.createGain();
-
-        // Create the gain node we'll use to controll the duration of the delay
-        _durationGainNode = audioContext.createGain();
-
-        // Create the delay node
-        _delayNode = audioContext.createDelay();
+        this.nodes = {
+            inputGainNode: audioContext.createGain(), // Create the input and output nodes of the effect
+            outputGainNode: audioContext.createGain(),
+            wetGainNode: audioContext.createGain(), // Create the gain-node we'll use to controll the wetness of the delay
+            durationGainNode: audioContext.createGain(), // Create the gain node we'll use to controll the duration of the delay
+            delayNode: audioContext.createDelay() // Create the delay node
+        };
 
         // Wire it all up
-        _inputGainNode.connect(_wetGainNode);
-        _inputGainNode.connect(_delayNode);
-        _durationGainNode.connect(_delayNode);
-        _delayNode.connect(_durationGainNode);
-        _delayNode.connect(_outputGainNode)
-        _wetGainNode.connect(_outputGainNode)
+        this.nodes.inputGainNode.connect(this.nodes.wetGainNode);
+        this.nodes.inputGainNode.connect(this.nodes.delayNode);
+        this.nodes.durationGainNode.connect(this.nodes.delayNode);
+        this.nodes.delayNode.connect(this.nodes.durationGainNode);
+        this.nodes.delayNode.connect(this.nodes.outputGainNode)
+        this.nodes.wetGainNode.connect(this.nodes.outputGainNode)
 
         // Set the input gain-node as the input-node.
-        this._node = _inputGainNode;
+        this._node = this.nodes.inputGainNode;
         // Set the output gain-node as the output-node.
-        this._outputNode = _outputGainNode;
+        this._outputNode = this.nodes.outputGainNode;
 
         // Set the default wetness to 1
         this.wet = 1;
@@ -65,7 +57,7 @@ export default class Delay extends MultiAudioNode {
         this._wet = parseFloat(wetness);
 
         // Set the new value for the wetness controll gain-node
-        _wetGainNode.gain.value = this._wet;
+        this.nodes.wetGainNode.gain.value = this._wet;
 
         return this._wet;
     }
@@ -88,7 +80,7 @@ export default class Delay extends MultiAudioNode {
         this._speed = parseFloat(speed);
 
         // Set the delayTime value of the delay-node
-        _delayNode.delayTime.value = this._speed;
+        this.nodes.delayNode.delayTime.value = this._speed;
 
         return this._speed;
     }
@@ -111,7 +103,7 @@ export default class Delay extends MultiAudioNode {
         this._duration = parseFloat(duration);
 
         // Set the duration gain-node value
-        _durationGainNode.gain.value = this._duration;
+        this.nodes.durationGainNode.gain.value = this._duration;
 
         return this._duration;
     }

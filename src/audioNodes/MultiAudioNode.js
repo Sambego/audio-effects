@@ -8,6 +8,12 @@ import SingleAudioNode from './SingleAudioNode';
  * The output node is the last audio-node in the effect, the next effect will be connected to this node.
  */
 export default class MultiAudioNode extends SingleAudioNode {
+    constructor(audioContext) {
+        super(audioContext);
+
+        this.nodes = {};
+    }
+
     /**
      * Getter for the effects output node.
      * @return {AudioNode}
@@ -43,12 +49,25 @@ export default class MultiAudioNode extends SingleAudioNode {
     }
 
     /**
-     * disconnect the effect.
+     * Disconnect the effect.
      * @return {Pedalboard AudioNode}
      */
     disconnect() {
         this.output.disconnect();
 
         return this.output;
+    }
+
+    /**
+     * Destroy an effect.
+     */
+    destroy() {
+        this.disconnect()
+
+        Object.keys(this.nodes).forEach(node => {
+            if (this.nodes[node].disconnect && typeof this.nodes[node].disconnect === 'function') {
+                this.nodes[node].disconnect();
+            }
+        });
     }
 };
