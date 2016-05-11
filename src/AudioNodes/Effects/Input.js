@@ -10,6 +10,7 @@ export default class Input extends SingleAudioNode {
     constructor(audioContext) {
         super(audioContext);
 
+        this._deferredConnects = [];
         this._hasPermissions = false;
     }
 
@@ -46,6 +47,11 @@ export default class Input extends SingleAudioNode {
                     this.input = stream;
                     this._hasPermissions = true;
 
+                    // Connect the deffered connects
+                    this._deferredConnects.forEach(node => {
+                        this.connect(node);
+                    });
+
                     resolve(stream);
                 }, error => {
                     reject(error);
@@ -54,6 +60,30 @@ export default class Input extends SingleAudioNode {
                 reject('Your browser does not support the use of user-media, please upgrade or use another browser!')
             }
         });
+    }
+
+    /**
+     * Connect the effect to other effects or native audio-nodes.
+     * @param  {Native AudioNode | Audio-effects AudioNode} node
+     * @return {Native AudioNode | Audio-effects AudioNode}
+     */
+    connect(node) {
+        // If there is no input node yet, connect when there is a node
+        if (typeof this._node === 'undefined') {
+            this._deferredConnects.push(node);
+
+            return;
+        }
+
+        // Check if the node is a Audio-effects AudioNode,
+        //  otherwise assume it's a native one.
+        if (node.node) {
+            this.node.connect(node.node);
+        } else {
+            this.node.connect(node);
+        }
+
+        return node;
     }
 
     /**
