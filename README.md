@@ -143,7 +143,7 @@ const irf = fetch('path/to/impulse-response-file', {
       });
 ```
 
-## Flanger
+## Tremolo
 Add a Tremolo effect
 
 ```javascript
