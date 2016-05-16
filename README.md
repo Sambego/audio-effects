@@ -6,6 +6,7 @@ A javascript library to create audio effects using the web-audio-api. This libra
 - Delay
 - Flanger
 - Reverb
+- Tremolo
 
 I will try to add more effects in the future.
 
@@ -140,6 +141,16 @@ const irf = fetch('path/to/impulse-response-file', {
       irf.then(buffer => {
          reverb.buffer = buffer;
       });
+```
+
+## Flanger
+Add a Tremolo effect
+
+```javascript
+import {Tremolo} from 'audio-effects';
+
+const tremolo = new Tremolo(audioContext);
+      tremolo.delay = 1; // Set the speed to 1Hz
 ```
 
 ## Chaining
