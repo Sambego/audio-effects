@@ -7,6 +7,7 @@
  * - Delay
  * - Flanger
  * - Reverb
+ * - Tremolo
  */
 import Input from './AudioNodes/Effects/Input';
 import Output from './AudioNodes/Effects/Output';
@@ -15,6 +16,7 @@ import Distortion from './AudioNodes/Effects/Distortion';
 import Delay from './AudioNodes/Effects/Delay';
 import Flanger from './AudioNodes/Effects/Flanger';
 import Reverb from './AudioNodes/Effects/Reverb';
+import Tremolo from './AudioNodes/Effects/Tremolo';
 
 export {Input as Input};
 export {Output as Output};
@@ -22,7 +24,7 @@ export {Volume as Volume};
 export {Distortion as Distortion};
 export {Delay as Delay};
 export {Flanger as Flanger};
-export {Reverb as Reverb};
+export {Tremolo as Tremolo};
 
 /**
  * Export the base audioNodes:
