@@ -24,6 +24,7 @@ export {Volume as Volume};
 export {Distortion as Distortion};
 export {Delay as Delay};
 export {Flanger as Flanger};
+export {Reverb as Reverb};
 export {Tremolo as Tremolo};
 
 /**
