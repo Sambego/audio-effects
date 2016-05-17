@@ -72,7 +72,7 @@ export default class Input extends SingleAudioNode {
         if (typeof this._node === 'undefined') {
             this._deferredConnects.push(node);
 
-            return;
+            return node;
         }
 
         // Check if the node is a Audio-effects AudioNode,
