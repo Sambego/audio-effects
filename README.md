@@ -150,7 +150,7 @@ Add a Tremolo effect
 import {Tremolo} from 'audio-effects';
 
 const tremolo = new Tremolo(audioContext);
-      tremolo.delay = 1; // Set the speed to 1Hz
+      tremolo.speed = 1; // Set the speed to 1Hz
 ```
 
 ## Chaining
@@ -176,7 +176,7 @@ if (HasAudioContext) {
     // The current browser supports the web-audio-api.
 }
 
-if (HasGetUserMedia {
+if (HasGetUserMedia) {
     // The current browser supports getUserMedia.
 }
 ```
