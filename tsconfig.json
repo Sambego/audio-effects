@@ -1,0 +1,33 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "noImplicitAny": false,
+        "sourceMap": false,
+        "outDir": "dist",
+        "rootDir": "src"
+    },
+    "filesGlob": "**/*.ts",
+    "exclude": [
+        "node_modules"
+    ],
+    "files": [
+        "src/audio-nodes/effects/Delay.ts",
+        "src/audio-nodes/effects/Distortion.ts",
+        "src/audio-nodes/effects/Flanger.ts",
+        "src/audio-nodes/effects/Input.ts",
+        "src/audio-nodes/effects/Output.ts",
+        "src/audio-nodes/effects/Reverb.ts",
+        "src/audio-nodes/effects/Tremolo.ts",
+        "src/audio-nodes/effects/Volume.ts",
+        "src/audio-nodes/MultiAudioNode.ts",
+        "src/audio-nodes/SingleAudioNode.ts",
+        "src/audio-nodes/SingleAudioNodeWrapper.ts",
+        "src/helpers/hasAudioContext.ts",
+        "src/helpers/hasGetUserMedia.ts",
+        "src/index.ts"
+    ],
+    "atom": {
+        "rewriteTsconfig": true
+    }
+}

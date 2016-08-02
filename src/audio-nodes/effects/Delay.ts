@@ -1,11 +1,15 @@
-import MultiAudioNode from '../MultiAudioNode';
+import {MultiAudioNode} from '../MultiAudioNode';
 
 /**
  * The audio-effects delay class.
  * This class lets you add a delay effect.
  */
-export default class Delay extends MultiAudioNode {
-    constructor(audioContext) {
+export class Delay extends MultiAudioNode {
+    private _wet: number;
+    private _speed: number;
+    private _duration: number;
+
+    constructor(audioContext: AudioContext) {
         super(audioContext);
 
         this.nodes = {
@@ -17,17 +21,17 @@ export default class Delay extends MultiAudioNode {
         };
 
         // Wire it all up
-        this.nodes.inputGainNode.connect(this.nodes.wetGainNode);
-        this.nodes.inputGainNode.connect(this.nodes.delayNode);
-        this.nodes.durationGainNode.connect(this.nodes.delayNode);
-        this.nodes.delayNode.connect(this.nodes.durationGainNode);
-        this.nodes.delayNode.connect(this.nodes.outputGainNode)
-        this.nodes.wetGainNode.connect(this.nodes.outputGainNode)
+        this.nodes['inputGainNode'].connect(this.nodes['wetGainNode']);
+        this.nodes['inputGainNode'].connect(this.nodes['delayNode']);
+        this.nodes['durationGainNode'].connect(this.nodes['delayNode']);
+        this.nodes['delayNode'].connect(this.nodes['durationGainNode']);
+        this.nodes['delayNode'].connect(this.nodes['outputGainNode'])
+        this.nodes['wetGainNode'].connect(this.nodes['outputGainNode'])
 
         // Set the input gain-node as the input-node.
-        this._node = this.nodes.inputGainNode;
+        this.node = this.nodes['inputGainNode'];
         // Set the output gain-node as the output-node.
-        this._outputNode = this.nodes.outputGainNode;
+        this.output = this.nodes['outputGainNode'];
 
         // Set the default wetness to 1
         this.wet = 1;
@@ -41,70 +45,61 @@ export default class Delay extends MultiAudioNode {
 
     /**
      * Getter for the effect's wetness
-     * @return {Float}
+     * @return {number}
      */
-    get wet() {
+    public get wet() : number|string {
         return this._wet;
     }
 
     /**
      * Setter for the effect's wetness
-     * @param  {Float} wetness
-     * @return {Float}
+     * @param  {number|string} wetness
      */
-    set wet(wetness) {
+    public set wet(wetness: number|string) {
         // Set the internal wetness value
-        this._wet = parseFloat(wetness);
+        this._wet = parseFloat(<string>wetness);
 
         // Set the new value for the wetness controll gain-node
-        this.nodes.wetGainNode.gain.value = this._wet;
-
-        return this._wet;
+        (<GainNode>this.nodes['wetGainNode']).gain.value = this._wet;
     }
 
     /**
      * Getter for the effect's speed
-     * @return {Float}
+     * @return {number}
      */
-    get speed() {
+    public get speed() : number|string {
         return this._speed;
     }
 
     /**
      * Setter for the effect's speed
-     * @param  {Float} speed
-     * @return {Float}
+     * @param {number|string} speed
      */
-    set speed(speed) {
+    public set speed(speed: number|string) {
         // Set the internal speed value
-        this._speed = parseFloat(speed);
+        this._speed = parseFloat(<string>speed);
 
         // Set the delayTime value of the delay-node
-        this.nodes.delayNode.delayTime.value = this._speed;
-
-        return this._speed;
+        (<DelayNode>this.nodes['delayNode']).delayTime.value = this._speed;
     }
 
     /**
      * Getter for the effect's duration
-     * @return {Float}
+     * @return {number}
      */
-    get duration() {
+    public get duration() : number|string {
         return this._duration;
     }
 
     /**
      * Setter for the effect's duration
-     * @param  {Float} duration
-     * @return {Float}
+     * @param  {number|string} duration
      */
-    set duration(duration) {
+    public set duration(duration: number|string) {
         // Set the internal duration value
-        this._duration = parseFloat(duration);
+        this._duration = parseFloat(<string>duration);
 
         // Set the duration gain-node value
-        this.nodes.durationGainNode.gain.value = this._duration;
-
-        return this._duration;
+        (<GainNode>this.nodes['durationGainNode']).gain.value = this._duration;
     }
 };

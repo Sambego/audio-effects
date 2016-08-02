@@ -1,13 +1,17 @@
-import _ from 'lodash';
-import SingleAudioNode from '../SingleAudioNode';
-import HasGetUserMedia from '../../helpers/HasGetUserMedia'
+import * as _ from 'lodash';
+import {SingleAudioNode} from '../SingleAudioNode';
+import {MultiAudioNode} from '../MultiAudioNode';
+import {HasGetUserMedia} from '../../helpers/HasGetUserMedia'
 
 /**
  * The audio-effects input node.
  * This class lets you set an input audio source or access the  uses' microphone.
  */
-export default class Input extends SingleAudioNode {
-    constructor(audioContext) {
+export class Input extends SingleAudioNode {
+    private _deferredConnects: Array<AudioNode>;
+    private _hasPermissions: boolean;
+
+    constructor(audioContext: AudioContext) {
         super(audioContext);
 
         this._deferredConnects = [];
@@ -16,29 +20,26 @@ export default class Input extends SingleAudioNode {
 
     /**
      * Getter for the effects input node.
-     * @return {[type]} [description]
+     * @return {AudioNode}
      */
-    get input() {
-        return this._node;
+    public get input() : AudioNode|MediaStream {
+        return <AudioNode>this.node;
     }
 
     /**
      * Setter for the effects input node.
-     * @param  {AudioStrea,} stream
-     * @return {AudioNode}
+     * @param  {AudioStream} stream
      */
-    set input(stream) {
+    public set input(stream: AudioNode|MediaStream) {
         // Create a media-stream source.
-        this._node = this._audioContext.createMediaStreamSource(stream);
-
-        return this._node;
+        this.node = this.audioContext.createMediaStreamSource(<MediaStream>stream);
     }
 
     /**
      * Get your microphone sound as input.
-     * @return {Promise} Resolves when you accept to use the microphone.
+     * @return {Promise<AudioNode>} Resolves when you accept to use the microphone.
      */
-    getUserMedia() {
+    public getUserMedia() : Promise<any> {
         return new Promise((resolve, reject) =>{
             if (HasGetUserMedia) {
                 navigator.getUserMedia({
@@ -64,23 +65,23 @@ export default class Input extends SingleAudioNode {
 
     /**
      * Connect the effect to other effects or native audio-nodes.
-     * @param  {Native AudioNode | Audio-effects AudioNode} node
-     * @return {Native AudioNode | Audio-effects AudioNode}
+     * @param  {AudioNode|SingleAudioNode|MultiAudioNode} node
+     * @return {AudioNode|SingleAudioNode|MultiAudioNode}
      */
-    connect(node) {
+    public connect(node: AudioNode|SingleAudioNode|MultiAudioNode) : AudioNode|SingleAudioNode|MultiAudioNode {
         // If there is no input node yet, connect when there is a node
-        if (typeof this._node === 'undefined') {
-            this._deferredConnects.push(node);
+        if (typeof this.node === 'undefined') {
+            this._deferredConnects.push(<AudioNode>node);
 
             return node;
         }
 
         // Check if the node is a Audio-effects AudioNode,
         //  otherwise assume it's a native one.
-        if (node.node) {
-            this.node.connect(node.node);
+        if ((<SingleAudioNode|MultiAudioNode>node).node) {
+            this.node.connect((<SingleAudioNode|MultiAudioNode>node).node);
         } else {
-            this.node.connect(node);
+            this.node.connect(<AudioNode>node);
         }
 
         return node;
@@ -88,9 +89,9 @@ export default class Input extends SingleAudioNode {
 
     /**
      * Get a list of audio in-and-output devices devices.
-     * @return {Array} A list of the available audio in-and-output devices.
+     * @return {Promise<Array<any>>} A list of the available audio in-and-output devices.
      */
-    getAudioDevices() {
+    public getAudioDevices() : Promise<Array<any>>{
         return new Promise((resolve, reject) =>{
             if (this._hasPermissions) {
                 navigator.mediaDevices.enumerateDevices().then(devices => {

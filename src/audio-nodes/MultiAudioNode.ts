@@ -1,4 +1,4 @@
-import SingleAudioNode from './SingleAudioNode';
+import {SingleAudioNode} from './SingleAudioNode';
 
 /**
  * The multi-audio-node class.
@@ -7,18 +7,18 @@ import SingleAudioNode from './SingleAudioNode';
  * The input node is the first audio-node in the effect, the previous effect will be connected to this node.
  * The output node is the last audio-node in the effect, the next effect will be connected to this node.
  */
-export default class MultiAudioNode extends SingleAudioNode {
-    constructor(audioContext) {
-        super(audioContext);
+export class MultiAudioNode extends SingleAudioNode {
+    private _outputNode: AudioNode;
 
-        this.nodes = {};
+    constructor(audioContext: AudioContext) {
+        super(audioContext);
     }
 
     /**
      * Getter for the effects output node.
      * @return {AudioNode}
      */
-    get output() {
+    get output() : AudioNode {
         return this._outputNode;
     }
 
@@ -27,22 +27,22 @@ export default class MultiAudioNode extends SingleAudioNode {
      * @param  {AudioNode} output
      * @return {AudioNode}
      */
-    set output(output) {
-        return this._outputNode = output;
+    set output(output: AudioNode) {
+        this._outputNode = output;
     }
 
     /**
      * Connect the effect to other effects or native audio-nodes.
-     * @param  {Native AudioNode | Audio-effects AudioNode} node
-     * @return {Native AudioNode | Audio-effects AudioNode}
+     * @param  {AudioNode|SingleAudioNode|MultiAudioNode} node
+     * @return {AudioNode|SingleAudioNode|MultiAudioNode}
      */
-    connect(node) {
+    public connect(node: AudioNode|SingleAudioNode|MultiAudioNode) : AudioNode|SingleAudioNode|MultiAudioNode {
         // Check if the node is one created by audio-effects
         //  otherwise assume it's a native one.
-        if (node.node) {
-            this.output.connect(node.node);
+        if ((<SingleAudioNode|MultiAudioNode>node).node) {
+            this.output.connect((<SingleAudioNode|MultiAudioNode>node).node);
         } else {
-            this.output.connect(node);
+            this.output.connect((<AudioNode>node));
         }
 
         return node;
@@ -50,9 +50,9 @@ export default class MultiAudioNode extends SingleAudioNode {
 
     /**
      * Disconnect the effect.
-     * @return {Audio-effects AudioNode}
+     * @return {AudioNode}
      */
-    disconnect() {
+    public disconnect() : AudioNode {
         this.output.disconnect();
 
         return this.output;
@@ -60,14 +60,15 @@ export default class MultiAudioNode extends SingleAudioNode {
 
     /**
      * Destroy an effect.
+     * @return {AudioNode}
      */
-    destroy() {
-        this.disconnect()
-
+    public destroy() : AudioNode {
         Object.keys(this.nodes).forEach(node => {
             if (this.nodes[node].disconnect && typeof this.nodes[node].disconnect === 'function') {
                 this.nodes[node].disconnect();
             }
         });
+
+        return this.disconnect()
     }
 };
