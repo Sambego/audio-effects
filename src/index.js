@@ -8,15 +8,17 @@
  * - Flanger
  * - Reverb
  * - Tremolo
+ * - Pitchshifter
  */
-import Input from './AudioNodes/Effects/Input';
-import Output from './AudioNodes/Effects/Output';
-import Volume from './AudioNodes/Effects/Volume';
-import Distortion from './AudioNodes/Effects/Distortion';
-import Delay from './AudioNodes/Effects/Delay';
-import Flanger from './AudioNodes/Effects/Flanger';
-import Reverb from './AudioNodes/Effects/Reverb';
-import Tremolo from './AudioNodes/Effects/Tremolo';
+import Input from './audio-nodes/effects/Input';
+import Output from './audio-nodes/effects/Output';
+import Volume from './audio-nodes/effects/Volume';
+import Distortion from './audio-nodes/effects/Distortion';
+import Delay from './audio-nodes/effects/Delay';
+import Flanger from './audio-nodes/effects/Flanger';
+import Reverb from './audio-nodes/effects/Reverb';
+import Tremolo from './audio-nodes/effects/Tremolo';
+import Pitchshifter from './audio-nodes/effects/Pitchshifter';
 
 export {Input as Input};
 export {Output as Output};
@@ -26,6 +28,7 @@ export {Delay as Delay};
 export {Flanger as Flanger};
 export {Reverb as Reverb};
 export {Tremolo as Tremolo};
+export {Pitchshifter as Pitchshifter};
 
 /**
  * Export the base audioNodes:
@@ -33,8 +36,8 @@ export {Tremolo as Tremolo};
  * - MultiAudioNode
  */
 
-import SingleAudioNode from './AudioNodes/SingleAudioNode';
-import MultiAudioNode from './AudioNodes/MultiAudioNode';
+import SingleAudioNode from './audio-nodes/SingleAudioNode';
+import MultiAudioNode from './audio-nodes/MultiAudioNode';
 
 export {SingleAudioNode as SingleAudioNode};
 export {MultiAudioNode as MultiAudioNode};
@@ -44,8 +47,8 @@ export {MultiAudioNode as MultiAudioNode};
  *  - HasAudioContext: Check if the current browser supports the web-audio-api.
  *  - HasGetUserMedia: Check if the current browser supports getUserMedia.
  */
-import HasAudioContext from './Helpers/HasAudioContext';
-import HasGetUserMedia from './Helpers/HasGetUserMedia';
+import HasAudioContext from './helpers/HasAudioContext';
+import HasGetUserMedia from './helpers/HasGetUserMedia';
 
 export {HasAudioContext as HasAudioContext};
 export {HasGetUserMedia as HasGetUserMedia};
