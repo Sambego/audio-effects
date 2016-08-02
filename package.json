@@ -15,7 +15,10 @@
   },
   "scripts": {
     "watch": "webpack --progress",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "BABEL_ENV=production npm run watch",
+    "prepublish": "npm run build",
+    "postversion": "git push; git push --tags; npm publish"
   },
   "repository": {
     "type": "git",
