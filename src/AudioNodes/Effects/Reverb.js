@@ -1,5 +1,5 @@
 import MultiAudioNode from '../MultiAudioNode';
-import irf from '../../audio/hall-reverb.ogg';
+import irf from 'file!../../../audio/hall-reverb.ogg';
 
 // Load the input response file
 const _getInputResponseFile = function getInputResponseFile() {
