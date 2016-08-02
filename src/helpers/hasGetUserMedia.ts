@@ -6,5 +6,4 @@ navigator.getUserMedia = navigator.getUserMedia ||
                          navigator.mozGetUserMedia ||
                          navigator.msGetUserMedia;
 
-const HasGetUserMedia = !!navigator.getUserMedia;
-export default HasGetUserMedia;
+export const HasGetUserMedia: boolean = !!navigator.getUserMedia;

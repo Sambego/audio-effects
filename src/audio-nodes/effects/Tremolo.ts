@@ -1,11 +1,13 @@
-import SingleAudioNode from '../SingleAudioNode';
+import {SingleAudioNode} from '../SingleAudioNode';
 
 /**
  * The audio-effects tremolo class.
  * This class lets you add a tremolo effect.
  */
-export default class Tremolo extends SingleAudioNode {
-    constructor(audioContext) {
+export class Tremolo extends SingleAudioNode {
+    private _speed: number;
+
+    constructor(audioContext: AudioContext) {
         super(audioContext);
 
         this.nodes = {
@@ -14,14 +16,14 @@ export default class Tremolo extends SingleAudioNode {
         };
 
         // Wire it all up
-	    this.nodes.oscillatorNode.connect(this.nodes.gainNode.gain);
+	    this.nodes['oscillatorNode'].connect((<any>this.nodes['gainNode']).gain);
 
         // Setup the oscillator
-        this.nodes.oscillatorNode.type = 'sine';
-        this.nodes.oscillatorNode.start(0);
+        (<OscillatorNode>this.nodes['oscillatorNode']).type = 'sine';
+        (<OscillatorNode>this.nodes['oscillatorNode']).start(0);
 
         // Set the gain-node as the main node.
-        this.node = this.nodes.gainNode;
+        this.node = this.nodes['gainNode'];
 
         // Set the default speed to 20Hz
         this.speed = 20;
@@ -29,24 +31,21 @@ export default class Tremolo extends SingleAudioNode {
 
     /**
      * Getter for the effect's speed
-     * @return {Float}
+     * @return {number}
      */
-    get speed() {
+    public get speed() : number|string {
         return this._speed;
     }
 
     /**
      * Setter for the effect's speed
-     * @param  {Float} speed
-     * @return {Float}
+     * @param  {number} speed
      */
-    set speed(speed) {
+    public set speed(speed: number|string) {
         // Set the internal speed value
-        this._speed = parseFloat(speed);
+        this._speed = parseFloat(<string>speed);
 
         // Set the new value for the oscillator frequency
-        this.nodes.oscillatorNode.frequency.value = this._speed;
-
-        return this._speed;
+        (<OscillatorNode>this.nodes['oscillatorNode']).frequency.value = this._speed;
     }
 };

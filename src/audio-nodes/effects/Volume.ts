@@ -1,15 +1,19 @@
-import SingleAudioNode from '../SingleAudioNode';
+import {SingleAudioNode} from '../SingleAudioNode';
 
 /**
  * The audio-effects volume class.
  * This class lets you change the volume of the audio signal.
  */
-export default class Volume extends SingleAudioNode{
-    constructor(audioContext) {
+export class Volume extends SingleAudioNode{
+    private _level: number;
+    private _levelBeforeMute: number;
+    private _mute: boolean;
+
+    constructor(audioContext: AudioContext) {
         super(audioContext);
 
         // Create the gain-node which we'll use to change the volume.
-        this.node = this._audioContext.createGain();
+        this.node = this.audioContext.createGain();
 
         // The initial volume level is 100%.
         this.level = 1;
@@ -19,48 +23,52 @@ export default class Volume extends SingleAudioNode{
     }
 
     /**
-     * Setter for the effects volume.
-     * @param  {Float} volume The volume, tipical between 0 and 1.
+     * Getter for the effects volume.
      * @return {Float}
      */
-    set level(volume) {
+    public get level() : number|string {
+        return this._level;
+    }
+
+    /**
+     * Setter for the effects volume.
+     * @param  {Float} volume The volume, tipical between 0 and 1.
+     */
+    public set level(volume: number|string) {
         // Parse the volume, it can not be lower than 0.
-        let vol = parseFloat(volume);
+        let vol:number = parseFloat(<string>volume);
             vol = (vol >= 0 ? vol : 0);
 
         // Set the internal volume value.
         this._level = vol;
 
         // Set the gainNode's gain value.
-        this._node.gain.value = vol;
+        (<GainNode>this.node).gain.value = vol;
 
         // Set the internal mute value.
         this._mute = (vol === 0);
-
-        return this._level;
     }
 
     /**
-     * Getter for the effects volume.
-     * @return {Float}
+     * Getter for the effcts mute functionality.
+     * @return {[type]} [description]
      */
-    get level() {
-        return this._level;
+    public get mute() : boolean {
+        return this._mute;
     }
 
     /**
      * Setter for the effects mute functionality.
      * @param  {Boolean} mute Whether the effect is muted.
-     * @return {Boolean}
      */
-    set mute(mute) {
+    public set mute(mute: boolean) {
         // Set the internal mute value.
         this._mute = !!mute;
 
 
         if (this._mute) {
             // Keep track of the volume before muting
-            this._levelBeforeMute = this.level;
+            this._levelBeforeMute = <number>this.level;
 
             // Set the volume to 0
             this.level = 0;
@@ -68,15 +76,5 @@ export default class Volume extends SingleAudioNode{
             // Set the volume to the previous volume.
             this.level = this._levelBeforeMute || this._level;
         }
-
-        return this._mute;
-    }
-
-    /**
-     * Getter for the effcts mute functionality.
-     * @return {[type]} [description]
-     */
-    get mute() {
-        return this._mute;
     }
 };
