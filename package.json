@@ -1,6 +1,6 @@
 {
   "name": "audio-effects",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "A javascript library to create audio effects using the web-audio-api",
   "main": "dist/index.js",
   "dependencies": {
