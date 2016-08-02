@@ -18,7 +18,6 @@ import Delay from './audio-nodes/effects/Delay';
 import Flanger from './audio-nodes/effects/Flanger';
 import Reverb from './audio-nodes/effects/Reverb';
 import Tremolo from './audio-nodes/effects/Tremolo';
-import Pitchshifter from './audio-nodes/effects/Pitchshifter';
 
 export {Input as Input};
 export {Output as Output};
@@ -28,7 +27,6 @@ export {Delay as Delay};
 export {Flanger as Flanger};
 export {Reverb as Reverb};
 export {Tremolo as Tremolo};
-export {Pitchshifter as Pitchshifter};
 
 /**
  * Export the base audioNodes:
