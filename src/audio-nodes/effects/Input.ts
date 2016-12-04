@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import {SingleAudioNode} from '../SingleAudioNode';
 import {MultiAudioNode} from '../MultiAudioNode';
 import {HasGetUserMedia} from '../../helpers/HasGetUserMedia'
@@ -95,14 +94,18 @@ export class Input extends SingleAudioNode {
         return new Promise((resolve, reject) =>{
             if (this._hasPermissions) {
                 navigator.mediaDevices.enumerateDevices().then(devices => {
-                    resolve(_.filter(devices, {kind: 'audioinput'}));
+                    resolve(devices.filter(device => {
+                        return device.kind && device.kind === 'audioinput';
+                    }));
                 }).catch(error => {
                     reject(error);
                 });
             } else {
                 this.getUserMedia().then(() => {
                     navigator.mediaDevices.enumerateDevices().then(devices => {
-                        resolve(_.filter(devices, {kind: 'audioinput'}));
+                        resolve(devices.filter(device => {
+                            return device.kind && device.kind === 'audioinput';
+                        }));
                     }).catch(error => {
                         reject(error);
                     });
