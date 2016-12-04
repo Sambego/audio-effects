@@ -54,7 +54,7 @@ export class Reverb extends MultiAudioNode {
      * @return {Promise<AudioBuffer>}
      */
     private getInputResponseFile() : Promise<ArrayBuffer|AudioBuffer>{
-        return fetch('../../../audio/hall-reverb.ogg', {
+        return fetch('../../audio/hall-reverb.ogg', {
             method: 'get'
         }).then(response => {
             return response.arrayBuffer();
