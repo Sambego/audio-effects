@@ -38,23 +38,14 @@ export class Reverb extends MultiAudioNode {
 
         // Set the default level to 1
         this.level = 1;
-
-        // Set the convolver buffer
-        if (buffer) {
-            this.buffer = buffer;
-        } else {
-            this.getInputResponseFile().then(buffer => {
-                this.buffer = buffer;
-            });
-        }
     }
 
     /**
      * Get the standard input responsefile.
      * @return {Promise<AudioBuffer>}
      */
-    private getInputResponseFile() : Promise<ArrayBuffer|AudioBuffer>{
-        return fetch('../../audio/hall-reverb.ogg', {
+    private getInputResponseFile(file) : Promise<ArrayBuffer|AudioBuffer>{
+        return fetch(fil, {
             method: 'get'
         }).then(response => {
             return response.arrayBuffer();
