@@ -117,29 +117,8 @@ import {Reverb} from 'audio-effects';
 const reverb = new Reverb(audioContext)
       reverb.wet = 0.5; // Set the wetness to 50%
       reverb.level = 1; // Set the level to 100%
-```
-
-By default the reverb effect will use the hall-reverb impulse response file from the awesome [web-audio-playground](https://github.com/cwilso/WebAudio) by Chris Wilson.
-
-if you want to use your own impulse response file you can configure it in 2 ways:
-
-```javascript
-const irf = fetch('path/to/impulse-response-file', {
-          method: 'get'
-      }).then(response => {
-          return response.arrayBuffer();
-      });
-
-      // Option 1: pass it as a parameter when creating the reverb effect
-      irf.then(buffer => {
-         const reverb = new Reverb(audioContext, buffer);
-      });
-
-      // Option 2: set the buffer after creating the reverb effect
-      const reverb = new Reverb(audioContext);
-
-      irf.then(buffer => {
-         reverb.buffer = buffer;
+      ReverbNode.getInputResponseFile('path/to/input-response-file').then(buffer => {
+        reverb.buffer = buffer;
       });
 ```
 

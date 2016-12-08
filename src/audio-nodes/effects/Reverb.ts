@@ -45,7 +45,7 @@ export class Reverb extends MultiAudioNode {
      * @param {string}  A path to the input response file
      * @return {Promise<AudioBuffer>}
      */
-    private getInputResponseFile(file: string) : Promise<ArrayBuffer|AudioBuffer>{
+    private static getInputResponseFile(file: string) : Promise<ArrayBuffer|AudioBuffer>{
         return fetch(file, {
             method: 'get'
         }).then(response => {
