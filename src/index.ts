@@ -32,5 +32,5 @@ export {MultiAudioNode as MultiAudioNode} from './audio-nodes/MultiAudioNode';
  *  - HasAudioContext: Check if the current browser supports the web-audio-api.
  *  - HasGetUserMedia: Check if the current browser supports getUserMedia.
  */
-export {HasAudioContext as HasAudioContext} from './helpers/HasAudioContext';
-export {HasGetUserMedia as HasGetUserMedia} from './helpers/HasGetUserMedia';
+export {HasAudioContext as HasAudioContext} from './helpers/hasAudioContext';
+export {HasGetUserMedia as HasGetUserMedia} from './helpers/hasGetUserMedia';
