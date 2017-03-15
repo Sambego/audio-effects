@@ -1,6 +1,6 @@
 import {SingleAudioNode} from '../SingleAudioNode';
 import {MultiAudioNode} from '../MultiAudioNode';
-import {HasGetUserMedia} from '../../helpers/HasGetUserMedia'
+import {HasGetUserMedia} from '../../helpers/hasGetUserMedia'
 
 /**
  * The audio-effects input node.
